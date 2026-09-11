@@ -54,27 +54,39 @@
   <div class="videos">
     <div class="video-card hidden" id="cardBroadcast">
       <video id="preview" muted playsinline></video>
-      <div class="tag">SUA TELA (minha transmissão)</div>
-      <button class="full" onclick="fullscreen('preview')">⛶</button>
+      <div class="tag">SUA TELA (sua transmissão)</div>
+      <button class="full" onclick="fullscreen('preview')">&#10530;</button>
     </div>
     <div class="video-card hidden" id="cardView">
       <video id="view" muted playsinline></video>
       <div class="tag">TELA DO AMIGO</div>
-      <button class="full" onclick="fullscreen('view')">⛶</button>
+      <button class="full" onclick="fullscreen('view')">&#10530;</button>
     </div>
   </div>
 
   <p class="note">
-    O vídeo vai direto de PC para PC (não passa por servidor).<br>
+    O vídeo vai direto de PC para PC (não passa por servidor de vídeo).<br>
     Cuidado: a tela inteira é transmitida — feche o que não quiser mostrar.
   </p>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.5/dist/peerjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mqtt@5.10.3/dist/mqtt.min.js"></script>
 <script>
   const $ = (id) => document.getElementById(id);
-  let peer = null;
+  const ICE = { iceServers: [
+    { urls: ["stun:stun.l.google.com:19302", "stun:stun1.l.google.com:19302"] },
+    { urls: "stun:global.stun.twilio.com:3478" }
+  ] };
+
+  let pc = null;
+  let mq = null;
   let myStream = null;
+  let myId = null;
+  let topic = null;
+  let role = null;
+  let polite = true;
+  let makingOffer = false;
+  let ignoreOffer = false;
 
   function cleanCode(raw) {
     return (raw || "").toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 12);
@@ -87,7 +99,7 @@
   }
 
   function refreshStop() {
-    $("stopWrap").style.display = (peer || myStream) ? "flex" : "none";
+    $("stopWrap").style.display = pc ? "flex" : "none";
   }
 
   function fullscreen(id) {
@@ -96,93 +108,142 @@
     else if (el.requestFullscreen) el.requestFullscreen();
   }
 
+  function sendSignal(data) {
+    if (mq && mq.connected && topic) {
+      mq.publish(topic, JSON.stringify({ sender: myId, sig: data }), { qos: 1 });
+    }
+  }
+
+  async function makeOffer() {
+    try {
+      await pc.setLocalDescription();
+    } catch (e) { return; }
+    sendSignal({ description: pc.localDescription });
+  }
+
+  async function handleSignal(sig) {
+    if (!pc) return;
+    if (sig.description) {
+      const offerCollision = sig.description.type === "offer" && (makingOffer || pc.signalingState !== "stable");
+      ignoreOffer = !polite && offerCollision;
+      if (ignoreOffer) return;
+      try {
+        await pc.setRemoteDescription(sig.description);
+      } catch (e) { return; }
+      if (sig.description.type === "offer") {
+        await makeOffer();
+      }
+    } else if (sig.candidate) {
+      try {
+        await pc.addIceCandidate(sig.candidate);
+      } catch (e) {}
+    }
+  }
+
+  function setupPc() {
+    pc = new RTCPeerConnection(ICE);
+    pc.onicecandidate = (e) => {
+      if (e.candidate) sendSignal({ candidate: e.candidate });
+    };
+    pc.ontrack = (e) => {
+      const v = $("view");
+      v.srcObject = e.streams[0];
+      $("cardView").classList.remove("hidden");
+      v.play();
+      setStatus("Conectado! Assistindo ao vivo.", "ok");
+      refreshStop();
+    };
+    pc.onconnectionstatechange = () => {
+      const s = pc.connectionState;
+      if (s === "disconnected" || s === "failed" || s === "closed") {
+        if (!$("cardView").classList.contains("hidden")) {
+          setStatus("Conexão encerrada. Você pode tentar novamente.", "bad");
+        }
+      }
+    };
+    pc.onnegotiationneeded = async () => {
+      await makeOffer();
+    };
+  }
+
+  function setupSignaling(roomCode, isHost) {
+    role = isHost ? "host" : "guest";
+    polite = isHost;
+    topic = "screenlive/" + roomCode.toLowerCase() + "/json";
+    myId = "sl" + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+
+    mq = mqtt.connect("wss://broker.emqx.io:8084/mqtt", {
+      clientId: myId,
+      keepalive: 30,
+      connectTimeout: 10000,
+      reconnectPeriod: 1500,
+      clean: true
+    });
+
+    mq.on("connect", () => {
+      mq.subscribe(topic, { qos: 1 }, () => {
+        if (pc && !pc.remoteDescription) makeOffer();
+      });
+      setStatus(role === "host"
+        ? `Sala <span class="code">${roomCode}</span> criada. Mande só este código para seu amigo. Aguardando...`
+        : `Procurando a sala <span class="code">${roomCode}</span>... Se o amigo ainda não começou, espere um instante.`, "");
+      refreshStop();
+    });
+    mq.on("reconnect", () => setStatus("Servidor de sinalização: tentando reconectar...", ""));
+    mq.on("error", () => setStatus("Erro de conexão com o servidor de sinalização. Verifique sua internet.", "bad"));
+    mq.on("message", (t, payload) => {
+      let msg;
+      try { msg = JSON.parse(payload.toString()); } catch (e) { return; }
+      if (msg.sender === myId) return;
+      handleSignal(msg.sig);
+    });
+  }
+
   async function startBroadcast() {
-    const code = cleanCode($("code").value);
-    if (code.length < 4) {
+    const roomCode = cleanCode($("code").value);
+    if (roomCode.length < 4) {
       setStatus("Digite um código de sala com pelo menos 4 letras ou números.", "bad");
       return;
     }
-    $("code").value = "";
     try {
       myStream = await navigator.mediaDevices.getDisplayMedia({ video: { frameRate: { ideal: 30 } }, audio: false });
     } catch (e) {
       setStatus("Captura de tela não permitida. Clique em \"Compartilhar\" e selecione a tela.", "bad");
       return;
     }
-    myStream.getVideoTracks()[0].addEventListener("ended", () => { setStatus("Transmissão encerrada (você parou o compartilhamento).", "bad"); maybeStop(); });
-
+    $("code").value = "";
     const pv = $("preview");
     pv.srcObject = myStream;
     $("cardBroadcast").classList.remove("hidden");
     await pv.play();
+    myStream.getVideoTracks()[0].addEventListener("ended", () => {
+      setStatus("Transmissão encerrada (você parou o compartilhamento).", "bad");
+      stopAll();
+    });
 
-    peer = new Peer("tela-" + code, { debug: 1 });
-    peer.on("open", () => {
-      setStatus(`Sala <span class="code">${code}</span> criada. Mande só esse código para seu amigo.`);
-      refreshStop();
-    });
-    peer.on("call", (call) => {
-      call.answer(myStream);
-      setStatus("Alguém conectou! Transmitindo ao vivo.", "ok");
-    });
-    peer.on("error", (err) => {
-      if (err.type === "unavailable-id") setStatus(`O código <span class="code">${code}</span> já está sendo usado por alguém.`, "bad");
-      else setStatus("Erro: " + err.message, "bad");
-    });
+    setupSignaling(roomCode, true);
+    setupPc();
+    pc.addTrack(myStream.getVideoTracks()[0]);
     refreshStop();
   }
 
   function startWatching() {
-    const code = cleanCode($("code").value);
-    if (code.length < 4) {
+    const roomCode = cleanCode($("code").value);
+    if (roomCode.length < 4) {
       setStatus("Digite o código da sala que você quer assistir.", "bad");
       return;
     }
     $("code").value = "";
-    peer = new Peer({ debug: 1 });
-    peer.on("open", () => {
-      setStatus(`Procurando a sala <span class="code">${code}</span>...`);
-      let attempts = 0;
-      const tryCall = () => {
-        if (attempts++ > 30) {
-          setStatus("Sala não encontrada. Confira o código ou o amigo não está transmitindo.", "bad");
-          maybeStop();
-          return;
-        }
-        const call = peer.call("tela-" + code);
-        call.on("stream", (remote) => {
-          const v = $("view");
-          v.srcObject = remote;
-          $("cardView").classList.remove("hidden");
-          v.play();
-          setStatus("Conectado! Assistindo ao vivo.", "ok");
-          refreshStop();
-        });
-        call.on("close", () => {
-          setStatus("O transmissor encerrou a sessão.", "bad");
-          maybeStop();
-        });
-        call.on("error", (err) => {
-          if (err.type === "peer-unavailable" || err.type === "negotiation-failed") setTimeout(tryCall, 1000);
-          else { setStatus("Erro: " + err.message, "bad"); maybeStop(); }
-        });
-      };
-      tryCall();
-    });
-    peer.on("error", (err) => {
-      setStatus("Erro: " + err.message, "bad");
-      maybeStop();
-    });
+    setupSignaling(roomCode, false);
+    setupPc();
+    pc.addTransceiver("video", { direction: "recvonly" });
     refreshStop();
   }
 
-  function maybeStop() {
-    if (!myStream) stopAll();
-  }
-
   function stopAll() {
-    if (peer) { peer.destroy(); peer = null; }
+    if (pc) { pc.close(); pc = null; }
     if (myStream) { myStream.getTracks().forEach((t) => t.stop()); myStream = null; }
+    if (mq) { try { mq.end(true); } catch (e) {} mq = null; }
     $("code").value = "";
     $("cardBroadcast").classList.add("hidden");
     $("cardView").classList.add("hidden");
@@ -193,8 +254,9 @@
   }
 
   window.addEventListener("beforeunload", () => {
-    if (peer) peer.destroy();
+    if (pc) pc.close();
     if (myStream) myStream.getTracks().forEach((t) => t.stop());
+    if (mq) { try { mq.end(true); } catch (e) {} }
   });
 </script>
 </body>
