@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -276,8 +276,8 @@
 <div class="login" id="loginOverlay">
   <div class="login-card">
     <h2>Bem-vindo ao <span style="color:var(--brand)">Screen Live</span></h2>
-    <p>Comunicação em tempo real. Chame amigos, compartilhe sua tela e converse com segurança.</p>
-    <div class="login-label">Nome de usuário</div>
+    <p>ComunicaÃ§Ã£o em tempo real. Chame amigos, compartilhe sua tela e converse com seguranÃ§a.</p>
+    <div class="login-label">Nome de usuÃ¡rio</div>
     <input id="loginName" placeholder="Como quer ser chamado..." maxlength="20" autocomplete="off">
     <button class="lbtn" onclick="doLogin()">Entrar</button>
   </div>
@@ -285,7 +285,7 @@
 
 <div class="modal-backdrop" id="modal" style="display:none">
   <div class="modal-card">
-    <h3 id="modalTitle">Título</h3>
+    <h3 id="modalTitle">TÃ­tulo</h3>
     <div class="modal-body" id="modalBody"></div>
     <div id="modalInputWrap"><input id="modalInput" inputmode="numeric" maxlength="4" placeholder="0000"></div>
     <div class="modal-actions">
@@ -321,19 +321,19 @@
         <span class="badge-online" id="voiceUsers"><i class="bdot"></i><span id="voiceUsersN">0</span></span>
       </button>
       <div id="userChans"></div>
-      <div class="room-note">Máx. de 10 pessoas por sala. Use o <b style="color:var(--green)">+ verde</b> para criar a sua própria sala.</div>
+      <div class="room-note">MÃ¡x. de 10 pessoas por sala. Use o <b style="color:var(--green)">+ verde</b> para criar a sua prÃ³pria sala.</div>
     </div>
     <div class="user-footer">
       <div class="uf-card">
         <div class="ub-av"><span class="letter" id="footAv">?</span><i class="udot"></i></div>
         <div class="uf-info">
-          <span class="ub-name" id="footName">VOCÊ</span>
+          <span class="ub-name" id="footName">VOCÃŠ</span>
           <span class="ub-sub" id="footSub">Ocioso</span>
         </div>
         <div class="ub-btns">
           <button class="ub-btn" id="footMic" onclick="toggleMic()" title="Silenciar"><span class="m">mic</span></button>
           <button class="ub-btn" id="footDeaf" onclick="toggleDeaf()" title="Suspender (deafen)"><span class="m">headphones</span></button>
-          <button class="ub-btn" onclick="toast('Configurações disponíveis em breve.')" title="Configurações"><span class="m">settings</span></button>
+          <button class="ub-btn" onclick="toast('ConfiguraÃ§Ãµes disponÃ­veis em breve.')" title="ConfiguraÃ§Ãµes"><span class="m">settings</span></button>
         </div>
       </div>
     </div>
@@ -346,15 +346,15 @@
         <span class="m htag" id="htag">tag</span>
         <span class="chan-title" id="chanTitle">bate-papo</span>
         <div class="vline"></div>
-        <p class="topic" id="chanTopic">Central de comunicação — entre na call e compartilhe sua tela.</p>
+        <p class="topic" id="chanTopic">Central de comunicaÃ§Ã£o â€” entre na call e compartilhe sua tela.</p>
         <div class="spacer"></div>
-        <div class="room-chip" id="roomChip"><i class="ld" id="roomLd"></i><span id="roomTxt">Sala: —</span></div>
+        <div class="room-chip" id="roomChip"><i class="ld" id="roomLd"></i><span id="roomTxt">Sala: â€”</span></div>
         <button class="phone-btn" onclick="enterCall()"><span class="m">call</span><span id="phoneTxt">Entrar na call</span></button>
       </div>
       <div class="msgs" id="textMsgs"></div>
       <div class="msg-bar">
         <div class="msg-field">
-          <button class="plus green" onclick="openNewChannel()" title="Criar sala ao vivo — nomeie e entre"><span class="m">add</span></button>
+          <button class="plus green" onclick="openNewChannel()" title="Criar sala ao vivo â€” nomeie e entre"><span class="m">add</span></button>
           <input id="textInput" placeholder="Mensagem para #bate-papo..." autocomplete="off">
           <div class="ib-right">
             <button class="ib-btn" onclick="openEmoji('textInput', this)" title="Emoji"><span class="m">sentiment_satisfied</span></button>
@@ -387,16 +387,17 @@
             </div>
 
             <div class="tile" id="tileView">
-              <video id="view" autoplay playsinline></video>
+              <video id="view" autoplay muted playsinline></video>
+              <audio id="viewAudio" autoplay></audio>
               <span class="tile-name" id="viewName" style="color:#fff">Tela do amigo</span>
             </div>
 
             <div class="waiting" id="awaiting">
               <div class="wbig"><span class="m">desktop_windows</span></div>
               <div class="avatars" id="awaitAvatars"></div>
-              <h3>Ninguém está transmitindo</h3>
-              <p>Quando alguém nesta sala compartilhar a tela, ela aparece aqui no centro. Você pode começar clicando em <b>Compartilhar tela</b> abaixo.</p>
-              <div class="share-hint">O vídeo sempre mantém o formato original, sem esticar.</div>
+              <h3>NinguÃ©m estÃ¡ transmitindo</h3>
+              <p>Quando alguÃ©m nesta sala compartilhar a tela, ela aparece aqui no centro. VocÃª pode comeÃ§ar clicando em <b>Compartilhar tela</b> abaixo.</p>
+              <div class="share-hint">O vÃ­deo sempre mantÃ©m o formato original, sem esticar.</div>
             </div>
           </div>
 
@@ -406,11 +407,11 @@
                 <div class="vb"></div><div class="vb"></div><div class="vb"></div><div class="vb"></div><div class="vb"></div>
               </div>
               <button class="ctl" id="btnMic" onclick="toggleMic()" title="Microfone"><span class="m">mic</span></button>
-              <button class="ctl" id="btnCam" onclick="toggleCam()" title="Câmera"><span class="m">videocam</span></button>
+              <button class="ctl" id="btnCam" onclick="toggleCam()" title="CÃ¢mera"><span class="m">videocam</span></button>
               <button class="ctl ctl-share" id="btnShare" onclick="shareScreen()" title="Compartilhar tela"><span class="m">screen_share</span></button>
               <div class="ctl-sep"></div>
               <button class="ctl" onclick="toast('Atividades em breve.')" title="Atividades"><span class="m">sports_esports</span></button>
-              <button class="ctl" onclick="toast('Mais opções em breve.')" title="Mais opções"><span class="m">more_horiz</span></button>
+              <button class="ctl" onclick="toast('Mais opÃ§Ãµes em breve.')" title="Mais opÃ§Ãµes"><span class="m">more_horiz</span></button>
               <button class="ctl ctl-leave" onclick="leaveCall()" title="Sair da call"><span class="m">call</span></button>
             </div>
           </div>
@@ -450,7 +451,7 @@
   ] };
 
   var pc = null, mq = null, myStream = null, myId = null, topic = null, role = null;
-  var pendingCands = [], gotAnswer = false, gotOffer = false, heartbeat = null;
+  var pendingCands = [], gotAnswer = false, gotOffer = false, heartbeat = null, offerTimer = null, candBuf = [], candFlushTimer = null, pcReady = false, pendingOffer = null;
   var profileName = localStorage.getItem("screlive_name") || "";
   var roomPassword = "";
   var modalResolver = null;
@@ -461,13 +462,15 @@
   var statsTimer = null, prevBytes = 0, prevTime = 0, curBps = 0;
 
   var MAX_PER_ROOM = 10;
-  var micStream = null, audioCtx = null, analyser = null, audioTrans = null, micRaf = null, fullTimer = null;
+  var micStream = null, audioCtx = null, analyser = null, audioTrans = null, micRaf = null, fullTimer = null, silentCtx = null, silentTrack = null, silentStream = null;
   var fd = null, rfd = null, remoteCtx = null, remoteAnalyser = null;
   var speakOn = false, remoteSpeak = false;
   var chanMode = "chat";
   var modalKind = null;
+  var viewStream = new MediaStream();
+  var remoteTrackCount = 0;
 
-  var EMOJIS = ["😀","😂","🤣","😍","😎","😮","😅","🥳","😢","😡","👍","👎","👏","🙏","🔥","❤️","💯","🎉","🎮","🚀","⚡","👾","✅","🍿","📺"];
+  var EMOJIS = ["ðŸ˜€","ðŸ˜‚","ðŸ¤£","ðŸ˜","ðŸ˜Ž","ðŸ˜®","ðŸ˜…","ðŸ¥³","ðŸ˜¢","ðŸ˜¡","ðŸ‘","ðŸ‘Ž","ðŸ‘","ðŸ™","ðŸ”¥","â¤ï¸","ðŸ’¯","ðŸŽ‰","ðŸŽ®","ðŸš€","âš¡","ðŸ‘¾","âœ…","ðŸ¿","ðŸ“º"];
 
   function cleanCode(raw) { return (raw || "").toUpperCase().replace(/[^0-9]/g, "").slice(0, 4); }
   function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
@@ -475,7 +478,7 @@
   function toast(m) { var t = $("toast"); t.textContent = m; t.classList.add("show"); clearTimeout(t._t); t._t = setTimeout(function () { t.classList.remove("show"); }, 2200); }
 
   /* ===== Suas salas (criar canal) ===== */
-  var BAD_WORDS = ["caralho","porra","foder","fodeu","foda-se","merda","bosta","puta","puto","piranha","vadia","vagabunda","vagabundo","corno","cuzão","cuzinho","rola","piroca","buceta","xota","xoxota","xereca","punheta","babaca","imbecil","idiota","burro","burra","escroto","escrota","nojento","nojenta","desgraça","desgraca","maldito","maldita","arromba","arrombado","pau","fdp","vsf","otário","otaria","cachorra","safado","safada","tarado","tarada","bicha","viado","veado","traveco","sapatão","nazista","fascista","chifrudo","chifrada","putinha","rabuda","cadelinha"];
+  var BAD_WORDS = ["caralho","porra","foder","fodeu","foda-se","merda","bosta","puta","puto","piranha","vadia","vagabunda","vagabundo","corno","cuzÃ£o","cuzinho","rola","piroca","buceta","xota","xoxota","xereca","punheta","babaca","imbecil","idiota","burro","burra","escroto","escrota","nojento","nojenta","desgraÃ§a","desgraca","maldito","maldita","arromba","arrombado","pau","fdp","vsf","otÃ¡rio","otaria","cachorra","safado","safada","tarado","tarada","bicha","viado","veado","traveco","sapatÃ£o","nazista","fascista","chifrudo","chifrada","putinha","rabuda","cadelinha"];
   function badWord(s) {
     var t = s.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9\s]/g, " ");
     for (var i = 0; i < BAD_WORDS.length; i++) {
@@ -506,7 +509,7 @@
       row.querySelector(".chan-name").textContent = ch.name;
       row.addEventListener("click", function (e) {
         if (e.target.closest && e.target.closest(".delc")) return;
-        if (state.inCall && roomPassword === ch.code) { toast("Você já está nesta sala."); return; }
+        if (state.inCall && roomPassword === ch.code) { toast("VocÃª jÃ¡ estÃ¡ nesta sala."); return; }
         joinRoom(ch.code);
       });
       var del = row.querySelector(".delc");
@@ -524,7 +527,7 @@
     return new Promise(function (res) {
       modalResolver = res;
       openModal("channel", "Criar sala ao vivo",
-        "Escolha um <b>nome</b> para a sua sala (sem palavrões). Depois defina a <b>senha de 4 dígitos</b>.<br>Até <b>10 pessoas</b> por sala.");
+        "Escolha um <b>nome</b> para a sua sala (sem palavrÃµes). Depois defina a <b>senha de 4 dÃ­gitos</b>.<br>AtÃ© <b>10 pessoas</b> por sala.");
     });
   }
   async function openNewChannel() {
@@ -581,12 +584,17 @@
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) throw new Error("no api");
       micStream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }, video: false });
       return true;
-    } catch (e) { toast("Não foi possível usar o microfone. Permita o acesso no navegador."); return false; }
+    } catch (e) { toast("NÃ£o foi possÃ­vel usar o microfone. Permita o acesso no navegador."); return false; }
   }
   function syncMicToPc(track) {
-    if (!audioTrans) return;
-    var sender = audioTrans.sender;
-    if (sender && sender.replaceTrack) sender.replaceTrack(track).catch(function () {});
+    try {
+      if (pc && pc.getTransceivers) pc.getTransceivers().forEach(function (t) {
+        if (t && t.sender && t.receiver && t.receiver.track && t.receiver.track.kind === "audio") {
+          try { t.sender.replaceTrack(track).catch(function () {}); } catch (e) {}
+        }
+      });
+    } catch (e) {}
+    if (audioTrans && audioTrans.sender) { try { audioTrans.sender.replaceTrack(track).catch(function () {}); } catch (e) {} }
   }
   function startVox() {
     if (!micStream) return;
@@ -670,7 +678,7 @@
   function toggleCam() {
     state.camOn = !state.camOn;
     $("btnCam") ? $("btnCam").classList.toggle("on-red", !state.camOn) : 0;
-    toast(state.camOn ? "Câmera ativada (disponível em breve)." : "Câmera desativada.");
+    toast(state.camOn ? "CÃ¢mera ativada (disponÃ­vel em breve)." : "CÃ¢mera desativada.");
   }
 
   /* ===== Modal ===== */
@@ -693,14 +701,14 @@
     return new Promise(function (res) {
       modalResolver = res;
       openModal("password", "Entrar na call",
-        "Digite a <b>senha de 4 dígitos</b> da sala ao vivo. Quem transmite e quem assiste usam a <b>mesma senha</b>.");
+        "Digite a <b>senha de 4 dÃ­gitos</b> da sala ao vivo. Quem transmite e quem assiste usam a <b>mesma senha</b>.");
     });
   }
   function modalConfirm() {
     if (modalKind === "channel") {
       var name = $("modalInput").value.trim();
       if (name.length < 2 || name.length > 24) { $("modalBody").innerHTML = "O nome da sala deve ter <b>2 a 24 caracteres</b>."; return; }
-      if (badWord(name)) { $("modalBody").innerHTML = "Nome <b>impróprio</b>. Escolha um nome sem palavrões."; return; }
+      if (badWord(name)) { $("modalBody").innerHTML = "Nome <b>imprÃ³prio</b>. Escolha um nome sem palavrÃµes."; return; }
       $("modal").style.display = "none";
       modalKind = null;
       if (modalResolver) { var r = modalResolver; modalResolver = null; r(name); }
@@ -709,7 +717,7 @@
     var isPw = modalKind === "password";
     if (isPw) {
       var v = cleanCode($("modalInput").value);
-      if (v.length !== 4) { $("modalBody").innerHTML = "A senha deve ter <b>exatamente 4 números</b>."; return; }
+      if (v.length !== 4) { $("modalBody").innerHTML = "A senha deve ter <b>exatamente 4 nÃºmeros</b>."; return; }
       $("modal").style.display = "none";
       modalKind = null;
       if (modalResolver) { var r = modalResolver; modalResolver = null; r(v); }
@@ -726,13 +734,13 @@
   function openHowTo() {
     openModal("info", "# como-funciona",
       "<ol>" +
-      "<li>Clique em <b>Sala ao vivo</b> e digite a <b>senha de 4 dígitos</b> que você escolher.</li>" +
+      "<li>Clique em <b>Sala ao vivo</b> e digite a <b>senha de 4 dÃ­gitos</b> que vocÃª escolher.</li>" +
       "<li>A call abre sozinha. Clique em <b>Compartilhar tela</b> para transmitir o seu jogo.</li>" +
-      "<li>Envie a <b>mesma senha de 4 dígitos</b> para seu amigo.</li>" +
-      "<li>O amigo abre o mesmo link, coloca o nome, digita a senha e a call abre. Clicando em <b>Compartilhar tela</b> ele também pode transmitir.</li>" +
-      "<li>Para sair, use o <b>botão vermelho</b> na barra de controles da call.</li>" +
+      "<li>Envie a <b>mesma senha de 4 dÃ­gitos</b> para seu amigo.</li>" +
+      "<li>O amigo abre o mesmo link, coloca o nome, digita a senha e a call abre. Clicando em <b>Compartilhar tela</b> ele tambÃ©m pode transmitir.</li>" +
+      "<li>Para sair, use o <b>botÃ£o vermelho</b> na barra de controles da call.</li>" +
       "</ol>" +
-      "<div class=\"well\">Somente quem tem a <b>senha certa</b> consegue entrar nesta call. Ninguém mais vê sua tela.</div>");
+      "<div class=\"well\">Somente quem tem a <b>senha certa</b> consegue entrar nesta call. NinguÃ©m mais vÃª sua tela.</div>");
   }
 
   /* ===== Emoji ===== */
@@ -789,21 +797,21 @@
         '<div style="width:56px;height:56px;border-radius:20px;background:var(--brand);display:flex;align-items:center;justify-content:center;margin-bottom:14px;box-shadow:0 0 26px -6px rgba(88,101,242,.55)"><span class="m" style="font-size:30px;color:#fff">campaign</span></div>' +
         '<h2 style="font-family:\'Plus Jakarta Sans\';font-weight:700;font-size:22px;color:#fff;margin-bottom:8px">Como funciona</h2>' +
         '<ol style="padding-left:20px;color:var(--t3)">' +
-        '<li>Clique em <b>Sala ao vivo</b> e digite a <b>senha de 4 dígitos</b> que você escolher.</li>' +
+        '<li>Clique em <b>Sala ao vivo</b> e digite a <b>senha de 4 dÃ­gitos</b> que vocÃª escolher.</li>' +
         '<li>A call abre na hora. Clique em <b>Compartilhar tela</b> para transmitir o jogo a 60 FPS.</li>' +
-        '<li>Ou use o botão <b style="color:var(--green)">+ verde</b> para criar a sua própria sala com nome (sem palavrões).</li>' +
-        '<li>Envie a <b>mesma senha</b> para seus amigos. Cada sala aceita até <b>10 pessoas</b>.</li>' +
-        '<li>Para falar, ative o <b>microfone</b>: as 5 barras verdes e a borda do vídeo reagem à sua voz.</li>' +
-        '<li>Para sair, use o <b>botão vermelho</b> na barra de controles da call.</li>' +
+        '<li>Ou use o botÃ£o <b style="color:var(--green)">+ verde</b> para criar a sua prÃ³pria sala com nome (sem palavrÃµes).</li>' +
+        '<li>Envie a <b>mesma senha</b> para seus amigos. Cada sala aceita atÃ© <b>10 pessoas</b>.</li>' +
+        '<li>Para falar, ative o <b>microfone</b>: as 5 barras verdes e a borda do vÃ­deo reagem Ã  sua voz.</li>' +
+        '<li>Para sair, use o <b>botÃ£o vermelho</b> na barra de controles da call.</li>' +
         '</ol></div>';
       tw.appendChild(hEl);
       cw.innerHTML = '';
       return;
     }
-    var welcome = '<div class="welcome"><div class="wicon"><span class="m">tag</span></div><h1>Bem-vindo ao #bate-papo</h1><p>O canal geral do SCREEN LIVE — sua central de transmissão, jogos e conversa. Entre na call para compartilhar a tela.</p></div><div class="day-sep"><span>Hoje</span></div>';
+    var welcome = '<div class="welcome"><div class="wicon"><span class="m">tag</span></div><h1>Bem-vindo ao #bate-papo</h1><p>O canal geral do SCREEN LIVE â€” sua central de transmissÃ£o, jogos e conversa. Entre na call para compartilhar a tela.</p></div><div class="day-sep"><span>Hoje</span></div>';
     if (!messages.length) {
-      tw.innerHTML = welcome + '<div class="msg-empty">Ainda não há mensagens nesta sala.<br>Digite algo abaixo ou <b>entre na call</b> para compartilhar sua tela.</div>';
-      cw.innerHTML = '<div class="msg-empty">Ainda não há mensagens na call.<br>Escreva algo para a sala!</div>';
+      tw.innerHTML = welcome + '<div class="msg-empty">Ainda nÃ£o hÃ¡ mensagens nesta sala.<br>Digite algo abaixo ou <b>entre na call</b> para compartilhar sua tela.</div>';
+      cw.innerHTML = '<div class="msg-empty">Ainda nÃ£o hÃ¡ mensagens na call.<br>Escreva algo para a sala!</div>';
       return;
     }
     tw.insertAdjacentHTML("beforeend", welcome);
@@ -812,7 +820,7 @@
       var el = document.createElement("div");
       el.className = "msg";
       el.innerHTML = '<div class="msg-av' + (self ? " self" : "") + '">' + esc(m.name.charAt(0).toUpperCase()) + '</div>' +
-        '<div class="msg-body"><div class="msg-meta"><span class="msg-name">' + esc(m.name) + (self ? " (você)" : "") + '</span><span class="msg-ts">' + fmtTs(m.ts) + '</span></div>' +
+        '<div class="msg-body"><div class="msg-meta"><span class="msg-name">' + esc(m.name) + (self ? " (vocÃª)" : "") + '</span><span class="msg-ts">' + fmtTs(m.ts) + '</span></div>' +
         '<div class="msg-text">' + esc(m.text) + '</div></div>';
       tw.appendChild(el);
       cw.appendChild(el.cloneNode(true));
@@ -847,17 +855,17 @@
     aw.classList.toggle("empty", n === 0);
     members.forEach(function (nm, id) {
       var a = ppAvatar(nm);
-      a.title = (id === myId ? nm + " (você)" : nm) + " · online";
+      a.title = (id === myId ? nm + " (vocÃª)" : nm) + " Â· online";
       aw.appendChild(a);
     });
     var mp = $("popMembers");
     mp.innerHTML = "";
-    if (!n) mp.innerHTML = '<div class="pop-row"><span style="color:var(--t4)">Ninguém na call.</span></div>';
+    if (!n) mp.innerHTML = '<div class="pop-row"><span style="color:var(--t4)">NinguÃ©m na call.</span></div>';
     members.forEach(function (nm, id) {
       var r = document.createElement("div");
       r.className = "pop-row";
       r.appendChild(ppAvatar(nm, "small"));
-      r.insertAdjacentHTML("beforeend", "<span>" + esc(nm) + (id === myId ? " <b style=\"color:var(--t4)\">(você)</b>" : "") + "</span>");
+      r.insertAdjacentHTML("beforeend", "<span>" + esc(nm) + (id === myId ? " <b style=\"color:var(--t4)\">(vocÃª)</b>" : "") + "</span>");
       mp.appendChild(r);
     });
     if ($("phoneTxt")) $("phoneTxt").textContent = roomPassword ? "Em uma call" : "Entrar na call";
@@ -877,7 +885,7 @@
     $("chanVoice").classList.toggle("chan-active", on);
     if (!on) setChatOpen(false);
     var textV = $("textView"), callV = $("callView");
-    if (on) { textV.classList.remove("on"); callV.classList.add("on"); setStatus("Você entrou na call. Aguardando uma transmissão..."); }
+    if (on) { textV.classList.remove("on"); callV.classList.add("on"); setStatus("VocÃª entrou na call. Aguardando uma transmissÃ£o..."); }
     else { callV.classList.remove("on"); textV.classList.add("on"); }
     if (on) startReceiving();
     else setFootSub("Ocioso");
@@ -906,32 +914,32 @@
     $("chanChat").classList.toggle("chan-active", !isHow);
     $("htag").textContent = isHow ? "campaign" : "tag";
     $("chanTitle").textContent = isHow ? "como-funciona" : "bate-papo";
-    $("chanTopic").textContent = isHow ? "Passo a passo para usar o Screen Live." : "Central de comunicação — entre na call e compartilhe sua tela.";
+    $("chanTopic").textContent = isHow ? "Passo a passo para usar o Screen Live." : "Central de comunicaÃ§Ã£o â€” entre na call e compartilhe sua tela.";
     renderMsgs();
   }
   function refreshRoomChip() {
     if (!roomPassword) {
       $("roomChip").classList.remove("on");
       $("roomLd").classList.remove("on");
-      $("roomTxt").textContent = "Sala: —";
+      $("roomTxt").textContent = "Sala: â€”";
     } else {
       $("roomChip").classList.add("on");
       $("roomLd").classList.add("on");
-      $("roomTxt").textContent = "Sala: " + roomPassword + (state.inCall ? " · Em call" : " · Conectado");
+      $("roomTxt").textContent = "Sala: " + roomPassword + (state.inCall ? " Â· Em call" : " Â· Conectado");
     }
   }
 
   /* ===== Entrar / sair da call ===== */
   async function enterCall() {
     if (!profileName) { $("loginName").focus(); toast("Coloque seu nome primeiro."); return; }
-    if (state.inCall) { toast("Você já está em uma call."); return; }
+    if (state.inCall) { toast("VocÃª jÃ¡ estÃ¡ em uma call."); return; }
     var p = await askPassword();
     if (!p) return;
     joinRoom(p);
   }
   function joinRoom(code) {
     if (!profileName) { $("loginName").focus(); toast("Coloque seu nome primeiro."); return; }
-    if (state.inCall) { toast("Você já está em uma call."); return; }
+    if (state.inCall) { toast("VocÃª jÃ¡ estÃ¡ em uma call."); return; }
     roomPassword = code;
     refreshRoomChip();
     connectRoom(code);
@@ -942,7 +950,7 @@
     if (fullTimer) clearTimeout(fullTimer);
     fullTimer = setTimeout(function () {
       if (state.inCall && mq && mq.connected && members.size >= MAX_PER_ROOM) {
-        toast("Esta sala está cheia (máx " + MAX_PER_ROOM + " pessoas). Você foi removido.");
+        toast("Esta sala estÃ¡ cheia (mÃ¡x " + MAX_PER_ROOM + " pessoas). VocÃª foi removido.");
         leaveCall();
       }
     }, 4500);
@@ -958,10 +966,10 @@
     }
     setInCall(false);
     renderMsgs();
-    if (!(opts && opts.silent)) toast("Você saiu da call.");
+    if (!(opts && opts.silent)) toast("VocÃª saiu da call.");
   }
 
-  /* ===== Sinalização ===== */
+  /* ===== SinalizaÃ§Ã£o ===== */
   function sendSignal(kind, data) {
     if (mq && mq.connected && topic) mq.publish(topic, JSON.stringify({ sender: myId, kind: kind, data: data }), { qos: 1 });
   }
@@ -977,7 +985,7 @@
   function onSignal(msg) {
     if (msg.kind === "presence") {
       var isNew = !members.has(msg.sender);
-      members.set(msg.sender, (msg.data && msg.data.name) || "Anônimo");
+      members.set(msg.sender, (msg.data && msg.data.name) || "AnÃ´nimo");
       if (isNew && !respondedTo.has(msg.sender) && msg.sender !== myId) {
         respondedTo.add(msg.sender);
         sendSignal("presence", { name: profileName });
@@ -986,40 +994,72 @@
       return;
     }
     if (msg.kind === "bye") { members.delete(msg.sender); renderMembers(); return; }
-    if (msg.kind === "msg") { addMsg(msg.sender, (msg.data && msg.data.n) || "Anônimo", (msg.data && msg.data.m) || ""); return; }
+    if (msg.kind === "msg") { addMsg(msg.sender, (msg.data && msg.data.n) || "AnÃ´nimo", (msg.data && msg.data.m) || ""); return; }
     if (role === "host") {
       if (msg.kind === "join") { hostSendOffer(); }
       else if (msg.kind === "answer") {
         gotAnswer = true;
-        try { pc.setRemoteDescription(msg.data); } catch (e) {}
+        if (offerTimer) { clearInterval(offerTimer); offerTimer = null; }
+        if (pc && (pc.signalingState === "have-local-offer" || pc.signalingState === "stable")) {
+          try { pc.setRemoteDescription(msg.data); } catch (e) {}
+        }
         flushCands();
-        setStatus("Conectado! Você está no ar.", "ok");
+        flushCands();
+        setStatus("Conectado! VocÃª estÃ¡ no ar.", "ok");
       } else if (msg.kind === "cand") {
-        if (pc && pc.remoteDescription) pc.addIceCandidate(msg.data).catch(function () {});
-        else pendingCands.push(msg.data);
+        var list = Array.isArray(msg.data) ? msg.data : [msg.data];
+        if (pc && pc.remoteDescription) list.forEach(function (x) { pc.addIceCandidate(x).catch(function () {}); });
+        else pendingCands = pendingCands.concat(list);
       }
     } else {
       if (msg.kind === "offer") {
+        if (!pcReady || !pc) { pendingOffer = msg.data; return; }
         gotOffer = true;
         if (heartbeat) { clearInterval(heartbeat); heartbeat = null; }
         (async function () {
           try {
             await pc.setRemoteDescription(msg.data);
             flushCands();
+var stk = ensureAudioTrack();
+            var micT = stk, micS = silentStream;
+            if (!state.muted && micStream && micStream.getAudioTracks()[0]) { micT = micStream.getAudioTracks()[0]; micS = micStream; }
+            if (micT && pc.getTransceivers) {
+              var audioMid = null;
+              var mm = (msg.data.sdp.split("m=audio")[1] || "").match(/a=mid:(\S+)/);
+              if (mm) audioMid = mm[1];
+              var trans2 = pc.getTransceivers();
+              for (var ti2 = 0; ti2 < trans2.length; ti2++) {
+                if (trans2[ti2].receiver && trans2[ti2].receiver.track && trans2[ti2].receiver.track.kind === "audio" && (!audioMid || trans2[ti2].mid === audioMid)) {
+                  try { trans2[ti2].direction = "sendrecv"; } catch (e) {}
+                  try { if (!trans2[ti2].sender.track || trans2[ti2].sender.track.id !== micT.id) trans2[ti2].sender.replaceTrack(micT); } catch (e) {}
+                  break;
+                }
+              }
+            }
             var ans = await pc.createAnswer();
+            if (micT && micS) { try { ans.sdp = forceAnswerAudioSend(ans.sdp, micT, micS); } catch (e) {} }
             await pc.setLocalDescription(ans);
             sendSignal("answer", pc.localDescription);
           } catch (e) {}
         })();
       } else if (msg.kind === "cand") {
-        if (pc && pc.remoteDescription) pc.addIceCandidate(msg.data).catch(function () {});
-        else pendingCands.push(msg.data);
+        var list = Array.isArray(msg.data) ? msg.data : [msg.data];
+        if (pc && pc.remoteDescription) list.forEach(function (x) { pc.addIceCandidate(x).catch(function () {}); });
+        else pendingCands = pendingCands.concat(list);
       }
     }
   }
   function flushCands() {
     var c = pendingCands.splice(0, pendingCands.length);
-    c.forEach(function (x) { pc.addIceCandidate(x).catch(function () {}); });
+    c.forEach(function (x) {
+      if (!Array.isArray(x)) x = [x];
+      x.forEach(function (y) { pc.addIceCandidate(y).catch(function () {}); });
+    });
+  }
+  function flushCandBuf() {
+    if (!candBuf.length) { if (candFlushTimer) { clearInterval(candFlushTimer); candFlushTimer = null; } return; }
+    var list = candBuf.splice(0, candBuf.length);
+    sendSignal("cand", list);
   }
 
   function connectRoom(code) {
@@ -1036,14 +1076,14 @@
       mq.subscribe(topic, { qos: 1 }, function () {
         setMembership();
         sendSignal("presence", { name: profileName });
-        if (pc && role === "host") hostSendOffer();
+        if (pc && role === "host") { hostSendOffer(); startOfferRetry(); }
         if (pc && role === "guest") startGuestHeartbeat();
       });
-      setStatus("Conectado à sala " + code + ". Escolha transmitir ou aguardar.", "ok");
+      setStatus("Conectado Ã  sala " + code + ". Escolha transmitir ou aguardar.", "ok");
       refreshRoomChip();
     });
-    mq.on("reconnect", function () { setStatus("Servidor de sinalização: tentando reconectar..."); });
-    mq.on("error", function () { setStatus("Erro de conexão com o servidor de sinalização. Verifique sua internet.", "bad"); });
+    mq.on("reconnect", function () { setStatus("Servidor de sinalizaÃ§Ã£o: tentando reconectar..."); });
+    mq.on("error", function () { setStatus("Erro de conexÃ£o com o servidor de sinalizaÃ§Ã£o. Verifique sua internet.", "bad"); });
     mq.on("message", function (t, payload) {
       var msg;
       try { msg = JSON.parse(payload.toString()); } catch (e) { return; }
@@ -1055,39 +1095,56 @@
   async function hostSendOffer() {
     if (!pc || role !== "host") return;
     if (pc.iceConnectionState === "connected" || pc.iceConnectionState === "completed") return;
+    var ss = pc.signalingState;
     try {
-      await pc.setLocalDescription();
-      sendSignal("offer", pc.localDescription);
-      setStatus("Sala com transmissão. Aguardando quem vai assistir...");
+      if (ss === "stable" || ss === "closed") { await pc.setLocalDescription(); }
+      if (pc.localDescription && pc.localDescription.type === "offer") {
+        sendSignal("offer", pc.localDescription);
+        setStatus("Sala com transmissÃ£o. Aguardando quem vai assistir...");
+        startOfferRetry();
+      }
     } catch (e) {}
+  }
+  function startOfferRetry() {
+    if (offerTimer) return;
+    offerTimer = setInterval(function () {
+      if (!pc) { if (offerTimer) { clearInterval(offerTimer); offerTimer = null; } return; }
+      if (gotAnswer) { if (offerTimer) { clearInterval(offerTimer); offerTimer = null; } return; }
+      if (role !== "host") { if (offerTimer) { clearInterval(offerTimer); offerTimer = null; } return; }
+      if (pc.iceConnectionState === "connected" || pc.iceConnectionState === "completed") { if (offerTimer) { clearInterval(offerTimer); offerTimer = null; } return; }
+      hostSendOffer();
+    }, 3000);
   }
 
   /* ===== WebRTC ===== */
   function setupPc() {
     pc = new RTCPeerConnection(ICE);
-    pc.onicecandidate = function (e) { if (e.candidate) sendSignal("cand", e.candidate); };
+    pc.onicecandidate = function (e) {
+      if (!e.candidate) return;
+      candBuf.push(e.candidate);
+      if (!candFlushTimer) candFlushTimer = setInterval(flushCandBuf, 250);
+    };
     pc.ontrack = function (e) {
-      if (e.track.kind === "audio") {
-        try { $("view").muted = false; } catch (err) {}
-        if (e.streams && e.streams[0]) listenRemote(e.streams[0]);
-        return;
+      try { viewStream.addTrack(e.track); } catch (err) {}
+      var v = $("view"), a = $("viewAudio");
+      if (v) { try { v.srcObject = viewStream; } catch (err) {} }
+      if (a) { try { a.srcObject = viewStream; } catch (err) {} }
+      if (e.track.kind === "video") {
+        $("tileView").classList.add("show");
+        updateStage();
+        setStatus("Recebendo transmissÃ£o do seu amigo.", "ok");
+      } else {
+        listenRemote(viewStream);
       }
-      var v = $("view");
-      try { v.srcObject = e.streams[0]; } catch (err) {}
-      $("tileView").classList.add("show");
-      updateStage();
-      try { $("view").muted = false; } catch (err) {}
-      if (e.streams && e.streams[0]) listenRemote(e.streams[0]);
-      v.play().catch(function () {});
-      v.addEventListener("playing", function () { setStatus("Recebendo transmissão do seu amigo.", "ok"); });
+      if (v) v.play().catch(function () {});
     };
     pc.oniceconnectionstatechange = function () {
       var s = pc && pc.iceConnectionState;
       if (!s) return;
-      if (s === "checking") setStatus("Estabelecendo conexão com o outro PC...");
+      if (s === "checking") setStatus("Estabelecendo conexÃ£o com o outro PC...");
       else if (s === "connected" || s === "completed") { setStatus("Conectado (P2P direto).", "ok"); startStats(); }
-      else if (s === "failed") { setStatus("Falha de conexão entre os PCs. Tente de novo.", "bad"); }
-      else if (s === "disconnected") setStatus("Conexão instável...");
+      else if (s === "failed") { setStatus("Falha de conexÃ£o entre os PCs. Tente de novo.", "bad"); }
+      else if (s === "disconnected") setStatus("ConexÃ£o instÃ¡vel...");
     };
   }
   function setCodecPrefs() {
@@ -1096,7 +1153,10 @@
       if (!caps || !caps.codecs || !pc || !pc.getTransceivers) return;
       var rank = function (m) { return (m === "video/H264" ? 0 : m === "video/VP8" ? 1 : m === "video/VP9" ? 2 : 3); };
       var sorted = caps.codecs.slice().sort(function (a, b) { return rank(a.mimeType) - rank(b.mimeType); });
-      pc.getTransceivers().forEach(function (t) { try { t.setCodecPreferences(sorted); } catch (e) {} });
+      pc.getTransceivers().forEach(function (t) {
+        if (!t.receiver || !t.receiver.track || t.receiver.track.kind !== "video") return;
+        try { t.setCodecPreferences(sorted); } catch (e) {}
+      });
     } catch (e) {}
   }
   function tearDownPc() {
@@ -1104,6 +1164,11 @@
     stopVox();
     stopRemoteAudio();
     if (heartbeat) { clearInterval(heartbeat); heartbeat = null; }
+    if (offerTimer) { clearInterval(offerTimer); offerTimer = null; }
+    if (candFlushTimer) { clearInterval(candFlushTimer); candFlushTimer = null; }
+    candBuf = [];
+    pcReady = false;
+    pendingOffer = null;
     if (pc) { try { pc.close(); } catch (e) {} pc = null; }
     audioTrans = null;
     gotAnswer = false; gotOffer = false;
@@ -1114,11 +1179,50 @@
     tearDownPc();
     setupPc();
     try { pc.addTransceiver("video", { direction: "recvonly" }); } catch (e) {}
-    try { audioTrans = pc.addTransceiver("audio", { direction: "sendrecv" }); } catch (e) {}
+    try {
+      var stk = ensureAudioTrack();
+      if (stk) audioTrans = pc.addTransceiver(stk, { streams: [silentStream], direction: "sendrecv" });
+      else audioTrans = pc.addTransceiver("audio", { direction: "sendrecv" });
+    } catch (e) { try { audioTrans = pc.addTransceiver("audio", { direction: "sendrecv" }); } catch (e2) {} }
     setCodecPrefs();
+    pcReady = true;
     if (!state.muted && micStream) { syncMicToPc(micStream.getAudioTracks()[0]); startVox(); }
     startGuestHeartbeat();
     updateStage();
+    if (pendingOffer && pc) {
+      var po = pendingOffer;
+      pendingOffer = null;
+      onSignal({ kind: "offer", data: po, sender: "queued" });
+    }
+  }
+  function ensureAudioTrack() {
+    if (silentTrack) return silentTrack;
+    try {
+      var AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) throw new Error("no AC");
+      silentCtx = new AC();
+      if (silentCtx.state === "suspended") { try { silentCtx.resume(); } catch (e) {} }
+      var dest = silentCtx.createMediaStreamDestination();
+      silentStream = dest.stream;
+      silentTrack = silentStream.getAudioTracks()[0];
+    } catch (e) {}
+    return silentTrack;
+  }
+  function forceAnswerAudioSend(sdp, srcTrack, srcStream) {
+    if (!srcTrack || !srcStream) return sdp;
+    var lines = sdp.split(/\r?\n/), out = [], inAudio = false;
+    for (var i = 0; i < lines.length; i++) {
+      var l = lines[i], t = l.trim();
+      if (/^m=/.test(t)) inAudio = (t.indexOf("m=audio ") === 0);
+      if (inAudio) {
+        if (/^a=recvonly$/.test(t)) { out.push("a=sendrecv"); continue; }
+        if (/^a=sendonly$/.test(t)) { out.push("a=sendrecv"); continue; }
+        if (/^a=msid/.test(t)) { continue; }
+        if (/^a=mid/.test(t)) { out.push(l); out.push("a=msid:" + srcStream.id + " " + srcTrack.id); continue; }
+      }
+      out.push(l);
+    }
+    return out.join("\r\n");
   }
 
   /* ===== Compartilhar tela ===== */
@@ -1127,7 +1231,7 @@
     if (!profileName) { $("loginName").focus(); toast("Coloque seu nome primeiro."); return; }
     if (!roomPassword) {
       var p = await askPassword();
-      if (!p) { toast("Você ainda não entrou em nenhuma call."); return; }
+      if (!p) { toast("VocÃª ainda nÃ£o entrou em nenhuma call."); return; }
       roomPassword = p; refreshRoomChip();
       connectRoom(p);
       setInCall(true);
@@ -1138,7 +1242,7 @@
     try {
       stream = await navigator.mediaDevices.getDisplayMedia({ video: { frameRate: { ideal: 60 } }, audio: true });
     } catch (e) {
-      setStatus("Captura de tela não permitida. Clique em \"Compartilhar\" e selecione a tela.", "bad");
+      setStatus("Captura de tela nÃ£o permitida. Clique em \"Compartilhar\" e selecione a tela.", "bad");
       return;
     }
     myStream = stream;
@@ -1146,10 +1250,10 @@
     var pv = $("preview");
     pv.srcObject = stream;
     $("tileBroad").classList.add("show");
-    $("broadName").innerHTML = profileName + " está transmitindo";
+    $("broadName").innerHTML = profileName + " estÃ¡ transmitindo";
     pv.play().catch(function () {});
     stream.getVideoTracks()[0].addEventListener("ended", function () {
-      setStatus("Transmissão encerrada (você parou o compartilhamento).", "bad");
+      setStatus("TransmissÃ£o encerrada (vocÃª parou o compartilhamento).", "bad");
       stopShare();
     });
     role = "host";
@@ -1164,9 +1268,15 @@
       var vs = pc.getSenders().find(function (x) { return x.track && x.track.kind === "video"; });
       if (vs) { var prm = vs.getParameters(); if (prm) { prm.degradationPreference = "maintain-framerate"; vs.setParameters(prm); } }
     } catch (e) {}
-    try { audioTrans = pc.addTransceiver("audio", { direction: "sendrecv" }); } catch (e) {}
     var saT = stream.getAudioTracks()[0];
-    if (saT) { try { pc.addTrack(saT, stream); } catch (e) {} }
+    var stk = ensureAudioTrack();
+    var audioStart = saT || stk;
+    var audioStr = saT ? stream : silentStream;
+    try {
+      audioTrans = pc.addTransceiver(audioStart, { streams: audioStr ? [audioStr] : [], direction: "sendrecv" });
+    } catch (e) {
+      try { audioTrans = pc.addTransceiver("audio", { direction: "sendrecv" }); } catch (e2) {}
+    }
     setCodecPrefs();
     if (!state.muted && micStream) { syncMicToPc(micStream.getAudioTracks()[0]); startVox(); }
     try {
@@ -1187,14 +1297,14 @@
     if (myStream) { myStream.getTracks().forEach(function (t) { try { t.stop(); } catch (e) {} }); myStream = null; }
     $("preview").srcObject = null;
     tearDownPc();
-    if (state.inCall) { setStatus("Você parou de compartilhar. Ainda na call."); startReceiving(); }
+    if (state.inCall) { setStatus("VocÃª parou de compartilhar. Ainda na call."); startReceiving(); }
     updateStage();
   }
 
   function updateStage() {
     var any = $("tileBroad").classList.contains("show") || $("tileView").classList.contains("show");
     $("awaiting").classList.toggle("hidden", any);
-    if (!any) setStatus(role === "host" ? "Compartilhando, aguardando..." : "Ninguém está transmitindo ainda.");
+    if (!any) setStatus(role === "host" ? "Compartilhando, aguardando..." : "NinguÃ©m estÃ¡ transmitindo ainda.");
   }
 
   /* ===== Stats ===== */
@@ -1230,14 +1340,14 @@
         if (prevTime && bytes >= prevBytes) { var dt = (now - prevTime) / 1000; if (dt > 0) curBps = ((bytes - prevBytes) * 8) / dt; }
         prevBytes = bytes; prevTime = now;
         if (curBps < 1000 && frames === 0) {
-          setStatus(sending ? "Conectado, mas o vídeo NÃO está enviando. Sua tela aparece no preview?" : "Conectado, aguardando o vídeo chegar...", "bad");
+          setStatus(sending ? "Conectado, mas o vÃ­deo NÃƒO estÃ¡ enviando. Sua tela aparece no preview?" : "Conectado, aguardando o vÃ­deo chegar...", "bad");
           return;
         }
         var res = resLabel(h);
-        var parts = [sending ? "Enviando vídeo" : "Recebendo vídeo", fmtRate(curBps)];
+        var parts = [sending ? "Enviando vÃ­deo" : "Recebendo vÃ­deo", fmtRate(curBps)];
         if (res) parts.push(res);
         if (fps) parts.push(Math.round(fps) + " fps");
-        setStatus(parts.join(" · ") + (frames ? " · " + frames + " quadros" : ""), "ok");
+        setStatus(parts.join(" Â· ") + (frames ? " Â· " + frames + " quadros" : ""), "ok");
       } catch (e) {}
     }, 2000);
   }
@@ -1261,7 +1371,8 @@
     $("tileView").classList.remove("speak");
     $("preview").srcObject = null;
     $("view").srcObject = null;
-    try { $("view").muted = true; } catch (e) {}
+    $("viewAudio").srcObject = null;
+    try { viewStream.getTracks().forEach(function (t) { viewStream.removeTrack(t); }); } catch (e) {}
     $("statusPill").classList.add("hidden");
     $("statusPill").textContent = "";
     renderMembers();
@@ -1277,13 +1388,13 @@
     if (mq) { try { mq.end(true); } catch (e) {} }
   });
 
-  /* ===== Inicialização ===== */
+  /* ===== InicializaÃ§Ã£o ===== */
   $("loginName").addEventListener("keydown", function (e) { if (e.key === "Enter") doLogin(); });
   $("modalInput").addEventListener("keydown", function (e) { if (e.key === "Enter") modalConfirm(); });
   $("textInput").addEventListener("keydown", function (e) { if (e.key === "Enter") pubMsg(); });
   $("chatInput").addEventListener("keydown", function (e) { if (e.key === "Enter") pubMsg(); });
   if (profileName) $("loginName").value = profileName;
-  try { $("view").muted = false; } catch (e) {}
+  try { $("view").muted = true; } catch (e) {}
   buildEmojiPop();
   renderUserChans();
   renderMsgs();
