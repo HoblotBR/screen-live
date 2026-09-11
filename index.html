@@ -14,19 +14,19 @@
   @media (max-width:1200px) { .app { grid-template-columns:72px 240px 1fr; } .members { display:none; } }
   @media (max-width:860px)  { .app { grid-template-columns:72px 1fr; } .channels { display:none; } }
 
-  /* ===== Barra de servidores (esquerda) ===== */
+  /* ===== Barra de servidores ===== */
   .rail { background:var(--bg3); display:flex; flex-direction:column; align-items:center; padding:12px 0; gap:8px; overflow-y:auto; }
   .icon-btn { width:48px; height:48px; border-radius:24px; background:#313338; color:#dbdee1; display:flex; align-items:center; justify-content:center; cursor:pointer; border:0; transition:border-radius .15s ease, background .15s ease; flex:none; }
   .icon-btn:hover { border-radius:16px; background:var(--blurple); color:#fff; }
-  .icon-btn.home { background:var(--blurple); color:#fff; border-radius:16px; position:relative; }
-  .icon-btn.server { background:var(--blurple); color:#fff; font-weight:700; font-size:16px; position:relative; }
+  .icon-btn.home { background:var(--blurple); color:#fff; border-radius:16px; }
+  .icon-btn.server { background:var(--blurple); color:#fff; font-weight:700; font-size:16px; }
   .divider { width:32px; height:2px; background:#35373c; border-radius:1px; flex:none; }
   .rail-spacer { flex:1; }
   .icon-btn svg { width:24px; height:24px; }
 
-  /* ===== Lista de canais ===== */
+  /* ===== Canais ===== */
   .channels { background:var(--bg2); display:flex; flex-direction:column; min-height:0; }
-  .server-name { height:48px; flex:none; display:flex; align-items:center; justify-content:space-between; padding:0 16px; font-weight:700; font-size:15px; color:#fff; border-bottom:1px solid var(--border); box-shadow:0 1px 0 #1e1f22; cursor:pointer; }
+  .server-name { height:48px; flex:none; display:flex; align-items:center; justify-content:space-between; padding:0 16px; font-weight:700; font-size:15px; color:#fff; border-bottom:1px solid var(--border); box-shadow:0 1px 0 #1e1f22; }
   .chan-section { font-size:11px; font-weight:700; color:var(--muted); padding:18px 8px 4px; letter-spacing:.4px; }
   .chan { display:flex; align-items:center; gap:8px; padding:6px 8px; margin:1px 8px; border-radius:4px; color:var(--muted); font-size:15px; cursor:pointer; white-space:nowrap; }
   .chan:hover { background:var(--hl); color:#dbdee1; }
@@ -34,15 +34,17 @@
   .chan .hash { font-size:18px; font-weight:400; color:#80848e; width:18px; text-align:center; }
   .chan svg { width:18px; height:18px; flex:none; }
   .chan.voice.active svg { color:var(--green); }
+  .chan.voice.locked::after { content:"\1F512"; margin-left:auto; font-size:13px; }
   .channels-foot { margin-top:auto; padding:10px 12px; font-size:11px; color:var(--muted); line-height:1.5; }
 
-  /* ===== Área principal ===== */
+  /* ===== Principal ===== */
   .main { background:var(--bg); display:flex; flex-direction:column; min-height:0; }
   .main-header { height:48px; flex:none; display:flex; align-items:center; gap:8px; padding:0 16px; border-bottom:1px solid var(--border); box-shadow:0 1px 0 #1e1f22; }
   .chan-title { display:flex; align-items:center; gap:8px; font-size:15px; font-weight:700; }
   .chan-title .hash { color:var(--muted); width:20px; text-align:center; }
   .room-chip { margin-left:auto; display:flex; align-items:center; gap:8px; font-size:12.5px; color:var(--muted); background:#24262b; border:1px solid var(--border); border-radius:14px; padding:4px 12px; }
-  .live-dot { width:8px; height:8px; border-radius:50%; background:var(--green); }
+  .live-dot { width:8px; height:8px; border-radius:50%; background:var(--muted); }
+  .live-dot.on { background:var(--green); }
 
   .stage-status { flex:none; padding:8px 16px 0; min-height:20px; font-size:13px; color:var(--muted); line-height:1.5; }
   .stage-status.ok { color:var(--green); }
@@ -65,30 +67,32 @@
   .empty .mic-circle { width:88px; height:88px; border-radius:50%; background:#26282c; display:flex; align-items:center; justify-content:center; color:#4e5058; }
   .empty .mic-circle svg { width:40px; height:40px; }
   .empty h3 { font-size:18px; font-weight:700; color:#dbdee1; }
-  .empty p { font-size:14px; color:var(--muted); max-width:380px; line-height:1.6; }
+  .empty p { font-size:14px; color:var(--muted); max-width:400px; line-height:1.6; }
 
   .ice { flex:none; padding:6px 16px 10px; font-size:12px; color:var(--muted); min-height:16px; line-height:1.6; }
   .ice.ok { color:var(--green); }
   .ice.bad { color:var(--red); }
 
-  .controls { flex:none; margin:0 16px 12px; display:flex; align-items:center; gap:10px; background:#383a40; border-radius:8px; padding:6px 8px; }
-  .controls input { flex:1; min-width:80px; background:transparent; border:0; outline:none; color:var(--text); font-size:15px; text-transform:uppercase; letter-spacing:1px; font-family:inherit; padding:6px 8px; }
-  .controls input::placeholder { color:#6d6f78; text-transform:none; letter-spacing:0; }
+  .controls { flex:none; margin:0 16px 12px; display:flex; align-items:center; gap:10px; background:#383a40; border-radius:8px; padding:6px 8px; flex-wrap:wrap; }
+  .sala-chip { display:flex; align-items:center; gap:6px; background:#2b2d31; border:1px solid var(--border); border-radius:6px; padding:7px 10px; font-size:13px; color:var(--muted); cursor:pointer; flex:none; }
+  .sala-chip:hover { border-color:var(--blurple); color:var(--text); }
+  .sala-chip b { color:#00a8fc; letter-spacing:1px; }
   .discord-btn { border:0; border-radius:4px; font-weight:600; font-size:14px; padding:9px 14px; cursor:pointer; font-family:inherit; flex:none; }
   .btn-transmit { background:var(--blurple); color:#fff; } .btn-transmit:hover { background:var(--blurple2); }
   .btn-watch { background:#4e5058; color:#fff; } .btn-watch:hover { background:#6d6f78; }
   .btn-stop { background:#404249; color:var(--red); border:1px solid var(--red); } .btn-stop:hover { background:var(--red); color:#fff; }
 
-  /* ===== Membros (direita) ===== */
+  /* ===== Membros ===== */
   .members { background:var(--bg2); border-left:1px solid var(--border); overflow-y:auto; padding:14px 8px; }
   .members-title { font-size:11px; font-weight:700; color:var(--muted); letter-spacing:.4px; padding:8px; }
   .member-row { display:flex; align-items:center; gap:10px; padding:6px 8px; border-radius:4px; }
   .member-row:hover { background:var(--hl); }
   .avatar { width:32px; height:32px; border-radius:50%; flex:none; background:linear-gradient(135deg,#5865f2,#9b59b6); display:flex; align-items:center; justify-content:center; color:#fff; font-size:13px; font-weight:700; position:relative; }
   .avatar .sdot { position:absolute; bottom:-2px; right:-2px; width:12px; height:12px; border-radius:50%; background:var(--green); border:3px solid var(--bg2); }
-  .member-name { font-size:15px; font-weight:500; }
+  .member-name { font-size:14px; font-weight:500; }
+  .member-note { padding:4px 8px; font-size:12.5px; color:var(--muted); line-height:1.5; }
 
-  /* ===== Barra de voz (embaixo) ===== */
+  /* ===== Barra de voz ===== */
   .voicebar { height:52px; flex:none; background:#232428; display:flex; align-items:center; justify-content:space-between; padding:0 8px; border-top:1px solid #1e1f22; }
   .vb-left { display:flex; align-items:center; gap:10px; padding:4px 6px; border-radius:4px; cursor:pointer; }
   .vb-left:hover { background:var(--hl); }
@@ -102,21 +106,77 @@
   .vb-icon svg { width:20px; height:20px; }
 
   ::-webkit-scrollbar { width:8px; } ::-webkit-scrollbar-track { background:transparent; } ::-webkit-scrollbar-thumb { background:#3f4147; border-radius:4px; }
+
+  /* ===== Tela de entrada ===== */
+  .login { position:fixed; inset:0; z-index:100; display:flex; align-items:center; justify-content:center; background:
+    radial-gradient(1100px 700px at 80% -10%, #2b2d9e 0%, transparent 55%),
+    radial-gradient(900px 600px at -10% 110%, #7a2bb0 0%, transparent 55%),
+    radial-gradient(1px 1px at 20% 30%, #ffffff66 50%, transparent 100%),
+    repeating-linear-gradient(0deg, #00000000 0 2px, #00000011 2px 4px),
+    #0e0f14; }
+  .login.hidden { display:none; }
+  .login-card { width:min(380px, 90vw); background:var(--bg2); border:1px solid var(--border); border-radius:14px; padding:32px 28px; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,.5); }
+  .login-logo { width:64px; height:64px; margin:0 auto 16px; border-radius:18px; background:linear-gradient(135deg,#5865f2,#9b59b6); display:flex; align-items:center; justify-content:center; font-size:22px; font-weight:800; color:#fff; }
+  .login-card h2 { font-size:20px; font-weight:700; color:#fff; }
+  .login-card p { margin:8px 0 18px; font-size:13.5px; color:var(--muted); line-height:1.5; }
+  .login-card input { width:100%; background:#1e1f22; border:1px solid var(--border); border-radius:6px; color:var(--text); padding:12px 14px; font-size:15px; outline:none; font-family:inherit; }
+  .login-card input:focus { border-color:var(--blurple); }
+  .login-card .discord-btn { width:100%; margin-top:10px; padding:12px; font-size:15px; }
+
+  /* ===== Modal ===== */
+  .modal-backdrop { position:fixed; inset:0; z-index:200; background:rgba(0,0,0,.6); display:flex; align-items:center; justify-content:center; padding:16px; }
+  .modal-card { width:min(430px, 92vw); background:var(--bg2); border:1px solid var(--border); border-radius:10px; padding:24px; }
+  .modal-card h3 { font-size:17px; font-weight:700; color:#fff; margin-bottom:12px; }
+  .modal-body { font-size:14px; color:#b5bac1; line-height:1.6; margin-bottom:16px; }
+  .modal-body ol, .modal-body ul { padding-left:20px; margin-top:6px; }
+  .modal-body li { margin-bottom:6px; }
+  .modal-body b { color:#fff; }
+  .modal-card input { width:100%; background:#1e1f22; border:1px solid var(--border); border-radius:6px; color:var(--text); padding:12px 14px; font-size:22px; letter-spacing:10px; text-align:center; outline:none; font-family:inherit; }
+  .modal-card input:focus { border-color:var(--blurple); }
+  .modal-actions { display:flex; gap:10px; margin-top:18px; justify-content:flex-end; }
+  .modal-actions .discord-btn { flex:1; }
+  .modal-note { font-size:12px; color:var(--muted); margin-top:8px; }
+
+  .well { background:#1e1f22; border:1px solid var(--border); border-radius:8px; padding:12px; margin-top:14px; font-size:13.5px; color:#b5bac1; line-height:1.7; }
+  .well b { color:#fff; }
 </style>
 </head>
 <body>
+
+<!-- Tela de entrada -->
+<div class="login" id="loginOverlay">
+  <div class="login-card">
+    <div class="login-logo">SL</div>
+    <h2>Bem-vindo ao SCREENLIVE</h2>
+    <p>Coloque seu nome para entrar e ver quem está transmitindo ao vivo.</p>
+    <input id="loginName" placeholder="Seu nome..." maxlength="20" autocomplete="off">
+    <button class="discord-btn btn-transmit" onclick="doLogin()">Entrar</button>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal-backdrop" id="modal" style="display:none">
+  <div class="modal-card">
+    <h3 id="modalTitle">Título</h3>
+    <div class="modal-body" id="modalBody"></div>
+    <div id="modalInputWrap"><input id="modalInput" inputmode="numeric" maxlength="4" placeholder="0000"></div>
+    <div class="modal-actions">
+      <button class="discord-btn btn-watch" onclick="closeModal()">Cancelar</button>
+      <button class="discord-btn btn-transmit" onclick="modalConfirm()">Confirmar</button>
+    </div>
+  </div>
+</div>
 
 <div class="app">
 
   <!-- Servidores -->
   <nav class="rail">
-    <button class="icon-btn home" title="Início"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3l9 8h-3v9h-4v-6h-4v6H6v-9H3z"/></svg></button>
+    <button class="icon-btn home" onclick="location.reload()" title="Início"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3l9 8h-3v9h-4v-6h-4v6H6v-9H3z"/></svg></button>
     <div class="divider"></div>
     <div class="icon-btn server" title="SCREENLIVE">SL</div>
     <button class="icon-btn" title="Adicionar servidor"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M11 5h2v6h6v2h-6v6h-2v-6H5v-2h6z"/></svg></button>
-    <button class="icon-btn" title="Explorar servidores"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18M3 12h18"/></svg></button>
     <div class="rail-spacer"></div>
-    <button class="icon-btn" title="Configurações do servidor"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.4 13a7.6 7.6 0 0 0 0-2l2-1.5-2-3.4-2.3 1a7.6 7.6 0 0 0-1.7-1L15 3.5h-4l-.4 2.6a7.6 7.6 0 0 0-1.7 1l-2.3-1-2 3.4 2 1.5a7.6 7.6 0 0 0 0 2l-2 1.5 2 3.4 2.3-1a7.6 7.6 0 0 0 1.7 1l.4 2.6h4l.4-2.6a7.6 7.6 0 0 0 1.7-1l2.3 1 2-3.4zM13 15.5A3.5 3.5 0 1 1 13 8a3.5 3.5 0 0 1 0 7.5z"/></svg></button>
+    <button class="icon-btn" title="Sair da conta" onclick="localStorage.removeItem('screlive_name'); location.reload();"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M2 21V3l20 9z"/></svg></button>
   </nav>
 
   <!-- Canais -->
@@ -124,31 +184,28 @@
     <div class="server-name">SCREENLIVE <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M7 10l5 5 5-5z"/></svg></div>
 
     <div class="chan-section">INFORMAÇÕES</div>
-    <div class="chan"><span class="hash">#</span> como-funciona</div>
-    <div class="chan"><span class="hash">#</span> dicas-antifurto</div>
+    <div class="chan" id="chanTutorial" onclick="openHowTo()"><span class="hash">#</span> como-funciona</div>
 
     <div class="chan-section">AO VIVO</div>
-    <div class="chan voice active"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a5 5 0 0 0-5 5v5a5 5 0 0 0 10 0V7a5 5 0 0 0-5-5zM4 12a8 8 0 0 0 16 0h-2a6 6 0 1 1-11.3 0H4z"/></svg> Sala Geral</div>
-    <div class="chan voice"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a5 5 0 0 0-5 5v5a5 5 0 0 0 10 0V7a5 5 0 0 0-5-5zM4 12a8 8 0 0 0 16 0h-2a6 6 0 1 1-11.3 0H4z"/></svg> Central de Games</div>
-    <div class="chan voice"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a5 5 0 0 0-5 5v5a5 5 0 0 0 10 0V7a5 5 0 0 0-5-5zM4 12a8 8 0 0 0 16 0h-2a6 6 0 1 1-11.3 0H4z"/></svg> Voar Alto</div>
+    <div class="chan voice locked" id="chanSala" onclick="enterSala()"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a5 5 0 0 0-5 5v5a5 5 0 0 0 10 0V7a5 5 0 0 0-5-5zM4 12a8 8 0 0 0 16 0h-2a6 6 0 1 1-11.3 0H4z"/></svg> Sala ao vivo</div>
 
-    <div class="channels-foot">Só quem tem o código da sala entra na transmissão.</div>
+    <div class="channels-foot">Só entra na sala quem tem a senha de 4 dígitos.</div>
   </aside>
 
   <!-- Principal -->
   <main class="main">
     <div class="main-header">
       <div class="chan-title"><span class="hash">#</span> transmissao-ao-vivo</div>
-      <div class="room-chip"><span class="live-dot"></span> CÓDIGO: <span id="roomcode">—</span></div>
+      <div class="room-chip"><span class="live-dot" id="liveDot"></span> SALA: <span id="roomcode">—</span></div>
     </div>
 
-    <div class="stage-status" id="status">Digite um código e escolha transmitir ou assistir.</div>
+    <div class="stage-status" id="status">Entre com seu nome e depois digite a senha na sala ao vivo para transmitir ou assistir.</div>
 
     <div class="stage">
       <div class="empty">
         <div class="mic-circle"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a5 5 0 0 0-5 5v5a5 5 0 0 0 10 0V7a5 5 0 0 0-5-5zM4 12a8 8 0 0 0 16 0h-2a6 6 0 1 1-11.3 0H4z"/></svg></div>
         <h3>Sem transmissão por aqui</h3>
-        <p>Digite um código na barra abaixo e clique em <strong>Transmitir minha tela</strong> para começar, ou em <strong>Assistir</strong> para ver a tela de um amigo.</p>
+        <p>Digite a senha da sala ao vivo e clique em <strong>Transmitir minha tela</strong> para começar, ou em <strong>Assistir</strong> para ver a tela de um amigo.</p>
       </div>
 
       <div class="video-card hidden" id="cardBroadcast">
@@ -167,7 +224,7 @@
     <div class="ice" id="iceline"></div>
 
     <div class="controls">
-      <input id="code" placeholder="Digite o código da sala (ex: CASA123)" maxlength="12" autocomplete="off">
+      <div class="sala-chip" onclick="enterSala()" title="Entrar na sala ao vivo">SALA <b id="salaCode">—</b> entrar</div>
       <button class="discord-btn btn-transmit" onclick="startBroadcast()">Transmitir minha tela</button>
       <button class="discord-btn btn-watch" onclick="startWatching()">Assistir</button>
       <div id="stopWrap" style="display:none">
@@ -178,31 +235,24 @@
 
   <!-- Membros -->
   <aside class="members">
-    <div class="members-title">ONLINE — 1</div>
-    <div class="member-row">
-      <div class="avatar"><span class="sdot"></span>V</div>
-      <span class="member-name">VOCÊ</span>
-    </div>
-    <div class="members-title" style="margin-top:18px">AO VIVO NESTA SALA</div>
-    <div class="member-row">
-      <div class="avatar" style="background:linear-gradient(135deg,#23a559,#2ecc71)">&#9679;</div>
-      <span class="member-name">Canal aberto para quem tiver o código</span>
-    </div>
+    <div class="members-title" id="membersTitle">AO VIVO — 0</div>
+    <div id="memberList"></div>
+    <div class="member-note">Mostra apenas quem entrou na sala ao vivo.</div>
   </aside>
 </div>
 
 <!-- Barra de voz -->
 <footer class="voicebar">
   <div class="vb-left">
-    <div class="avatar" style="background:linear-gradient(135deg,#5865f2,#9b59b6)"><span class="sdot"></span>V</div>
+    <div class="avatar" id="vbAvatar"><span class="sdot"></span>V</div>
     <div class="vb-info">
-      <span class="vb-name">VOCÊ</span>
+      <span class="vb-name" id="vbName">VOCÊ</span>
       <span class="vb-status" id="vbStatus">Ocioso</span>
     </div>
   </div>
   <div style="display:flex; align-items:center; gap:10px;">
-    <button class="vb-icon" id="btnMic" title="Microfone" onclick="toggleIcon(this)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a5 5 0 0 0-5 5v5a5 5 0 0 0 10 0V7a5 5 0 0 0-5-5zM4 12a8 8 0 0 0 16 0h-2a6 6 0 1 1-11.3 0H4z"/></svg></button>
-    <button class="vb-icon" id="btnHead" title="Fones de ouvido" onclick="toggleIcon(this)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 12a9 9 0 0 1 18 0v6a3 3 0 0 1-3 3h-2v-8h2v2h1V12a7 7 0 0 0-14 0v3h1v8H6a3 3 0 0 1-3-3z"/></svg></button>
+    <button class="vb-icon" title="Microfone" onclick="toggleIcon(this)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a5 5 0 0 0-5 5v5a5 5 0 0 0 10 0V7a5 5 0 0 0-5-5zM4 12a8 8 0 0 0 16 0h-2a6 6 0 1 1-11.3 0H4z"/></svg></button>
+    <button class="vb-icon" title="Fones de ouvido" onclick="toggleIcon(this)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 12a9 9 0 0 1 18 0v6a3 3 0 0 1-3 3h-2v-8h2v2h1V12a7 7 0 0 0-14 0v3h1v8H6a3 3 0 0 1-3-3z"/></svg></button>
     <button class="vb-icon red" title="Desconectar" onclick="location.reload()"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 4l4 4h-3v3l-2-2v-1H9zm4 4v2.9a4 4 0 1 1-8 0V10h2v2.9a2 2 0 1 0 4 0V10z"/></svg></button>
     <div style="opacity:.4">|</div>
     <button class="vb-icon" title="Configurações"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.4 13a7.6 7.6 0 0 0 0-2l2-1.5-2-3.4-2.3 1a7.6 7.6 0 0 0-1.7-1L15 3.5h-4l-.4 2.6a7.6 7.6 0 0 0-1.7 1l-2.3-1-2 3.4 2 1.5a7.6 7.6 0 0 0 0 2l-2 1.5 2 3.4 2.3-1a7.6 7.6 0 0 0 1.7 1l.4 2.6h4l.4-2.6a7.6 7.6 0 0 0 1.7-1l2.3 1 2-3.4zM13 15.5A3.5 3.5 0 1 1 13 8a3.5 3.5 0 0 1 0 7.5z"/></svg></button>
@@ -231,8 +281,117 @@
   let gotOffer = false;
   let heartbeat = null;
 
-  function cleanCode(raw) { return (raw || "").toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 12); }
+  let profileName = localStorage.getItem("screlive_name") || "";
+  let roomPassword = "";
+  let modalResolver = null;
+  const members = new Map();
+  const respondedTo = new Set();
 
+  function cleanCode(raw) { return (raw || "").toUpperCase().replace(/[^0-9]/g, "").slice(0, 4); }
+
+  /* ===== Entrada / nome ===== */
+  function doLogin() {
+    const n = $("loginName").value.trim();
+    if (n.length < 1) { $("loginName").focus(); return; }
+    profileName = n;
+    localStorage.setItem("screlive_name", n);
+    $("loginOverlay").classList.add("hidden");
+    $("vbName").textContent = n;
+    $("vbAvatar").textContent = n.charAt(0).toUpperCase();
+    renderMembers();
+  }
+
+  function toggleIcon(btn) {
+    if (btn.classList.contains("red")) btn.classList.remove("red");
+    else btn.classList.add("red");
+  }
+
+  /* ===== Modal ===== */
+  function openModal(kind, title, body) {
+    $("modalTitle").textContent = title;
+    $("modalBody").innerHTML = body;
+    $("modalInput").value = "";
+    $("modalInputWrap").style.display = (kind === "password") ? "" : "none";
+    $("modalConfirm").textContent = (kind === "password") ? "Entrar" : "OK";
+    $("modal").style.display = "flex";
+    if (kind === "password") setTimeout(() => $("modalInput").focus(), 60);
+  }
+
+  function askPassword() {
+    return new Promise((res) => {
+      modalResolver = res;
+      openModal("password", "Entrar na sala ao vivo",
+        "Digite a <b>senha de 4 dígitos</b> que a pessoa que está transmitindo criou.");
+    });
+  }
+
+  async function enterSala() {
+    if (!profileName) { $("loginName").focus(); return; }
+    if (mq) { setStatus("Você já está em uma sala. Clique em <b>Encerrar</b> para trocar.", "bad"); return; }
+    const p = await askPassword();
+    if (!p) return;
+    connectRoom(p);
+  }
+
+  function openHowTo() {
+    openModal("info", "# como-funciona — Como transmitir",
+      "<ol>" +
+      "<li>Clique na sala <b>Sala ao vivo</b> (seção AO VIVO) e digite a <b>senha de 4 dígitos</b> escolhida por você.</li>" +
+      "<li>Clique em <b>Transmitir minha tela</b> e escolha o monitor ou a janela do jogo.</li>" +
+      "<li>Envie a <b>senha (código da sala)</b> para seu amigo.</li>" +
+      "<li>O amigo entra no mesmo link, coloca o nome, digita a <b>mesma senha</b> na sala e clica em <b>Assistir</b>.</li>" +
+      "<li>Para encerrar, clique em <b>Encerrar</b> ou pare o compartilhamento no navegador.</li>" +
+      "</ol>" +
+      "<div class='well'>Só quem estiver com a <b>senha certa</b> consegue transmitir ou assistir nesta sala.<br>Ninguém mais consegue ver sua transmissão.</div>");
+  }
+
+  function modalConfirm() {
+    const kind = $("modalInputWrap").style.display === "" ? "password" : "info";
+    if (kind === "password") {
+      const v = cleanCode($("modalInput").value);
+      if (v.length !== 4) { $("modalBody").innerHTML = "A senha deve ter <b>exatamente 4 números</b>."; return; }
+      $("modal").style.display = "none";
+      if (modalResolver) { const r = modalResolver; modalResolver = null; r(v); }
+    } else {
+      $("modal").style.display = "none";
+    }
+  }
+
+  function closeModal() {
+    $("modal").style.display = "none";
+    if (modalResolver) { const r = modalResolver; modalResolver = null; r(null); }
+  }
+
+  /* ===== Membros ===== */
+  function renderMembers() {
+    const list = $("memberList");
+    list.innerHTML = "";
+    $("membersTitle").textContent = "AO VIVO — " + members.size;
+    if (members.size === 0) {
+      list.innerHTML = '<div style="padding:8px;font-size:13px;color:var(--muted)">Ninguém na sala ainda.</div>';
+      return;
+    }
+    members.forEach((name, id) => {
+      const row = document.createElement("div");
+      row.className = "member-row";
+      const a = document.createElement("div");
+      a.className = "avatar";
+      a.innerHTML = '<span class="sdot"></span>' + (name.charAt(0) || "?").toUpperCase();
+      const s = document.createElement("span");
+      s.className = "member-name";
+      s.textContent = (id === myId) ? name + " (você)" : name;
+      row.append(a, s);
+      list.append(row);
+    });
+  }
+
+  function setMembership() {
+    members.clear();
+    members.set(myId, profileName);
+    renderMembers();
+  }
+
+  /* ===== Status ===== */
   function setStatus(msg, cls) {
     const s = $("status");
     s.className = "stage-status " + (cls || "");
@@ -247,24 +406,53 @@
 
   function refreshStop() { $("stopWrap").style.display = pc ? "flex" : "none"; }
 
+  function writeChips() {
+    $("roomcode").textContent = roomPassword || "—";
+    $("salaCode").textContent = roomPassword || "—";
+    $("liveDot").classList.toggle("on", !!roomPassword);
+    $("chanSala").classList.toggle("active", !!roomPassword);
+    const vs = $("vbStatus");
+    if (vs && !roomPassword) vs.textContent = "Ocioso";
+  }
+
   function fullscreen(id) {
     const el = $(id);
     if (document.fullscreenElement) document.exitFullscreen();
     else if (el.requestFullscreen) el.requestFullscreen();
   }
 
-  function toggleIcon(btn) {
-    if (btn.classList.contains("red")) btn.classList.remove("red");
-    else btn.classList.add("red");
-  }
-
+  /* ===== Sinalização ===== */
   function sendSignal(kind, data) {
     if (mq && mq.connected && topic) {
       mq.publish(topic, JSON.stringify({ sender: myId, kind: kind, data: data }), { qos: 1 });
     }
   }
 
+  function startGuestHeartbeat() {
+    if (heartbeat) return;
+    heartbeat = setInterval(() => {
+      if (gotOffer || !mq || !mq.connected) return;
+      sendSignal("join", true);
+    }, 3000);
+    sendSignal("join", true);
+  }
+
   function onSignal(msg) {
+    if (msg.kind === "presence") {
+      const isNew = !members.has(msg.sender);
+      members.set(msg.sender, (msg.data && msg.data.name) || "Anônimo");
+      if (isNew && !respondedTo.has(msg.sender) && msg.sender !== myId) {
+        respondedTo.add(msg.sender);
+        sendSignal("presence", { name: profileName });
+      }
+      renderMembers();
+      return;
+    }
+    if (msg.kind === "bye") {
+      members.delete(msg.sender);
+      renderMembers();
+      return;
+    }
     if (role === "host") {
       if (msg.kind === "join") {
         hostSendOffer();
@@ -301,36 +489,49 @@
     c.forEach((x) => pc.addIceCandidate(x).catch(() => {}));
   }
 
-  function fmtKB(n) { return (n / 1000).toFixed(0) + " kB"; }
+  /* ===== Criação do sinal / sala ===== */
+  function connectRoom(code) {
+    roomPassword = code;
+    writeChips();
+    if (mq) return;
 
-  let statsTimer = null;
-  function startStats() {
-    stopStats();
-    statsTimer = setInterval(async () => {
-      if (!pc) return;
-      try {
-        const stats = await pc.getStats();
-        let bytesS = 0, framesS = 0, bytesR = 0, framesR = 0, fpsR = 0;
-        stats.forEach((s) => {
-          const isVid = (s.kind || s.mediaType) === "video";
-          if (!isVid) return;
-          if (s.type === "outbound-rtp") { bytesS = s.bytesSent; framesS = s.framesSent; }
-          if (s.type === "inbound-rtp") { bytesR = s.bytesReceived; framesR = s.framesReceived; fpsR = s.framesPerSecond || 0; }
-        });
-        if (role === "host") {
-          setIce(bytesS > 0
-            ? `Conectado (P2P) · Enviando vídeo: ${fmtKB(bytesS)} · ${framesS} quadros`
-            : "Conectado, mas o vídeo NÃO está sendo enviado. Confira se sua tela aparece no preview.", "bad");
-        } else {
-          setIce(bytesR > 0
-            ? `Recebendo vídeo: ${fmtKB(bytesR)} · ${framesR} quadros · ${fpsR} fps`
-            : "Conectado, mas o vídeo do outro PC não está chegando. Peça a ele para confirmar a própria prévia.", "bad");
-        }
-      } catch (e) {}
-    }, 2000);
-  }
-  function stopStats() {
-    if (statsTimer) { clearInterval(statsTimer); statsTimer = null; }
+    topic = "screenlive/" + code + "/json";
+    myId = "sl" + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+
+    mq = mqtt.connect("wss://broker.emqx.io:8084/mqtt", {
+      clientId: myId,
+      keepalive: 30,
+      connectTimeout: 10000,
+      reconnectPeriod: 1500,
+      clean: true,
+      will: {
+        topic: topic,
+        payload: JSON.stringify({ sender: myId, kind: "bye" }),
+        qos: 1,
+        retain: false
+      }
+    });
+
+    mq.on("connect", () => {
+      mq.subscribe(topic, { qos: 1 }, () => {
+        setMembership();
+        sendSignal("presence", { name: profileName });
+        if (pc && role === "host") hostSendOffer();
+        if (pc && role === "guest") startGuestHeartbeat();
+      });
+      setStatus(`Você entrou na sala <span class="code">${code}</span>. Escolha transmitir ou assistir.`, "ok");
+      const vs = $("vbStatus");
+      if (vs) vs.textContent = "Na sala " + code;
+      refreshStop();
+    });
+    mq.on("reconnect", () => setStatus("Servidor de sinalização: tentando reconectar...", ""));
+    mq.on("error", () => setStatus("Erro de conexão com o servidor de sinalização. Verifique sua internet.", "bad"));
+    mq.on("message", (t, payload) => {
+      let msg;
+      try { msg = JSON.parse(payload.toString()); } catch (e) { return; }
+      if (msg.sender === myId) return;
+      onSignal(msg);
+    });
   }
 
   async function hostSendOffer() {
@@ -342,6 +543,7 @@
     } catch (e) {}
   }
 
+  /* ===== WebRTC ===== */
   function setupPc() {
     pc = new RTCPeerConnection(ICE);
     pc.onicecandidate = (e) => { if (e.candidate) sendSignal("cand", e.candidate); };
@@ -379,68 +581,81 @@
     } catch (e) {}
   }
 
-  function showCaptureInfo() {
-    try {
-      const s = myStream.getVideoTracks()[0].getSettings();
-      const st = myStream.getVideoTracks()[0].readyState;
-      setIce(`Capturando tela ${s.width}x${s.height}${s.frameRate ? " @" + Math.round(s.frameRate) + "fps" : ""} · ${st === "live" ? "ativa" : "parada"}.`, "ok");
-      const vs = $("vbStatus");
-      if (vs) vs.textContent = "Transmitindo minha tela";
-    } catch (e) {}
+  /* ===== Medidor ===== */
+  let statsTimer = null;
+  let prevBytes = 0, prevTime = 0, curBps = 0;
+
+  function fmtRate(bps) {
+    if (bps >= 1000000) return (bps / 1000000).toFixed(1) + " Mbps";
+    return Math.round(bps / 1000) + " kbps";
   }
 
-  function setupSignaling(roomCode, isHost) {
-    role = isHost ? "host" : "guest";
-    topic = "screenlive/" + roomCode.toLowerCase() + "/json";
-    myId = "sl" + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
-    const rc = $("roomcode");
-    if (rc) rc.textContent = roomCode;
+  function resLabel(h) {
+    if (!h) return "";
+    if (h >= 1400) return "1440p";
+    if (h >= 900) return "1080p";
+    if (h >= 700) return "720p";
+    if (h >= 480) return "480p";
+    if (h >= 360) return "360p";
+    return "";
+  }
 
-    mq = mqtt.connect("wss://broker.emqx.io:8084/mqtt", {
-      clientId: myId,
-      keepalive: 30,
-      connectTimeout: 10000,
-      reconnectPeriod: 1500,
-      clean: true
-    });
-
-    mq.on("connect", () => {
-      mq.subscribe(topic, { qos: 1 }, () => {
-        if (role === "host") {
-          if (pc) setTimeout(hostSendOffer, 300);
-        } else {
-          heartbeat = setInterval(() => {
-            if (gotOffer || !mq || !mq.connected) return;
-            sendSignal("join", true);
-          }, 3000);
-          sendSignal("join", true);
+  function startStats() {
+    stopStats();
+    prevBytes = 0; prevTime = 0; curBps = 0;
+    statsTimer = setInterval(async () => {
+      if (!pc) return;
+      try {
+        const sending = role === "host";
+        const stats = await pc.getStats();
+        const now = performance.now();
+        let bytes = 0, frames = 0, fps = 0, h = 0;
+        stats.forEach((s) => {
+          const isVid = (s.kind || s.mediaType) === "video";
+          if (!isVid) return;
+          if (sending && s.type === "outbound-rtp") { bytes = s.bytesSent; frames = s.framesSent; fps = s.framesPerSecond || 0; h = s.frameHeight || 0; }
+          if (!sending && s.type === "inbound-rtp") { bytes = s.bytesReceived; frames = s.framesReceived; fps = s.framesPerSecond || 0; h = s.frameHeight || 0; }
+        });
+        if (prevTime && bytes >= prevBytes) {
+          const dt = (now - prevTime) / 1000;
+          if (dt > 0) curBps = ((bytes - prevBytes) * 8) / dt;
         }
-      });
-      setStatus(role === "host"
-        ? `Sala <span class="code">${roomCode}</span> criada. Mande só este código para seu amigo.`
-        : `Procurando a sala <span class="code">${roomCode}</span>...`, "");
-      refreshStop();
-    });
-    mq.on("reconnect", () => setStatus("Servidor de sinalização: tentando reconectar...", ""));
-    mq.on("error", () => setStatus("Erro de conexão com o servidor de sinalização. Verifique sua internet.", "bad"));
-    mq.on("message", (t, payload) => {
-      let msg;
-      try { msg = JSON.parse(payload.toString()); } catch (e) { return; }
-      if (msg.sender === myId) return;
-      onSignal(msg);
-    });
+        prevBytes = bytes; prevTime = now;
+
+        if (curBps < 1000 && frames === 0) {
+          setIce(sending
+            ? "Conectado, mas o vídeo NÃO está sendo enviado. Confira se sua tela aparece no preview."
+            : "Conectado, aguardando o vídeo do outro PC chegar...", "bad");
+          return;
+        }
+        const res = resLabel(h);
+        const parts = [sending ? "Enviando vídeo" : "Recebendo vídeo", fmtRate(curBps)];
+        if (res) parts.push(res);
+        if (fps) parts.push(Math.round(fps) + " fps");
+        setIce(parts.join(" · ") + (frames ? " · " + frames + " quadros" : ""), "ok");
+      } catch (e) {}
+    }, 2000);
+  }
+  function stopStats() {
+    if (statsTimer) { clearInterval(statsTimer); statsTimer = null; }
   }
 
+  /* ===== Ações ===== */
   async function startBroadcast() {
-    const roomCode = cleanCode($("code").value);
-    if (roomCode.length < 4) { setStatus("Digite um código com pelo menos 4 letras ou números.", "bad"); return; }
+    if (!profileName) { $("loginName").focus(); setStatus("Coloque seu nome primeiro.", "bad"); return; }
+    if (!roomPassword) {
+      const p = await askPassword();
+      if (!p) { setStatus("Você não entrou em nenhuma sala.", "bad"); return; }
+      roomPassword = p;
+      writeChips();
+    }
+    let roomCode = roomPassword;
     try {
       myStream = await navigator.mediaDevices.getDisplayMedia({ video: { frameRate: { ideal: 30 } }, audio: false });
     } catch (e) {
       setStatus("Captura de tela não permitida. Clique em \"Compartilhar\" e selecione a tela.", "bad");
       return;
     }
-    $("code").value = "";
     const pv = $("preview");
     pv.srcObject = myStream;
     $("cardBroadcast").classList.remove("hidden");
@@ -450,7 +665,8 @@
       stopAll();
     });
 
-    setupSignaling(roomCode, true);
+    role = "host";
+    if (!mq) connectRoom(roomCode);
     setupPc();
     try {
       pc.addTransceiver(myStream.getVideoTracks()[0], {
@@ -461,18 +677,33 @@
       pc.addTrack(myStream.getVideoTracks()[0]);
     }
     setCodecPrefs();
-    showCaptureInfo();
+    try {
+      const s = myStream.getVideoTracks()[0].getSettings();
+      setIce(`Capturando tela ${s.width}x${s.height}${s.frameRate ? " @" + Math.round(s.frameRate) + "fps" : ""}.`, "ok");
+    } catch (e) {}
+    const vs = $("vbStatus");
+    if (vs) vs.textContent = "Transmitindo minha tela";
+    if (mq && mq.connected) hostSendOffer();
     refreshStop();
   }
 
-  function startWatching() {
-    const roomCode = cleanCode($("code").value);
-    if (roomCode.length < 4) { setStatus("Digite o código da sala que você quer assistir.", "bad"); return; }
-    $("code").value = "";
-    setupSignaling(roomCode, false);
+  async function startWatching() {
+    if (!profileName) { $("loginName").focus(); setStatus("Coloque seu nome primeiro.", "bad"); return; }
+    if (!roomPassword) {
+      const p = await askPassword();
+      if (!p) { setStatus("Você não entrou em nenhuma sala.", "bad"); return; }
+      roomPassword = p;
+      writeChips();
+    }
+    let roomCode = roomPassword;
+    role = "guest";
+    if (!mq) connectRoom(roomCode);
     setupPc();
     pc.addTransceiver("video", { direction: "recvonly" });
     setCodecPrefs();
+    const vs = $("vbStatus");
+    if (vs) vs.textContent = "Assistindo a sala " + roomCode;
+    if (mq && mq.connected) startGuestHeartbeat();
     refreshStop();
   }
 
@@ -484,16 +715,18 @@
     if (mq) { try { mq.end(true); } catch (e) {} mq = null; }
     gotAnswer = false; gotOffer = false;
     pendingCands = [];
-    const rc = $("roomcode");
-    if (rc) rc.textContent = "—";
+    members.clear();
+    respondedTo.clear();
+    renderMembers();
+    roomPassword = "";
+    writeChips();
     const vs = $("vbStatus");
     if (vs) vs.textContent = "Ocioso";
-    $("code").value = "";
     $("cardBroadcast").classList.add("hidden");
     $("cardView").classList.add("hidden");
     $("preview").srcObject = null;
     $("view").srcObject = null;
-    setStatus("Sessão encerrada.");
+    setStatus("Sessão encerrada. Você saiu da sala.");
     setIce("");
     refreshStop();
   }
@@ -505,6 +738,13 @@
     if (myStream) myStream.getTracks().forEach((t) => t.stop());
     if (mq) { try { mq.end(true); } catch (e) {} }
   });
+
+  /* ===== Inicialização ===== */
+  $("loginName").addEventListener("keydown", (e) => { if (e.key === "Enter") doLogin(); });
+  $("modalInput").addEventListener("keydown", (e) => { if (e.key === "Enter") modalConfirm(); });
+  if (profileName) {
+    $("loginName").value = profileName;
+  }
 </script>
 </body>
 </html>
