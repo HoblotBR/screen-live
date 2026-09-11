@@ -161,6 +161,38 @@
     c.forEach((x) => pc.addIceCandidate(x).catch(() => {}));
   }
 
+  function fmtKB(n) { return (n / 1000).toFixed(0) + " kB/s"; }
+
+  let statsTimer = null;
+  function startStats() {
+    stopStats();
+    statsTimer = setInterval(async () => {
+      if (!pc) return;
+      try {
+        const stats = await pc.getStats();
+        let bytesS = 0, framesS = 0, bytesR = 0, framesR = 0, fpsR = 0;
+        stats.forEach((s) => {
+          if (s.type === "outbound-rtp" && s.mediaType === "video") { bytesS = s.bytesSent; framesS = s.framesSent; }
+          if (s.type === "inbound-rtp" && s.mediaType === "video") { bytesR = s.bytesReceived; framesR = s.framesReceived; fpsR = s.framesPerSecond || 0; }
+        });
+        if (role === "host") {
+          setIce(bytesS > 0
+            ? `Conectado (P2P direto) · Enviando vídeo: ${fmtKB(bytesS)} · ${framesS} quadros`
+            : framesS > 0
+              ? "Conectado (P2P direto) · Enviando vídeo..."
+              : "Conectado, mas ainda sem quadros de vídeo sendo enviados...", "");
+        } else {
+          setIce(bytesR > 0
+            ? `Recebendo vídeo: ${fmtKB(bytesR)} · ${framesR} quadros · ${fpsR} fps`
+            : "Conectado (P2P direto). Aguardando quadros de vídeo chegarem...", "");
+        }
+      } catch (e) {}
+    }, 2000);
+  }
+  function stopStats() {
+    if (statsTimer) { clearInterval(statsTimer); statsTimer = null; }
+  }
+
   async function hostSendOffer() {
     if (!pc || role !== "host") return;
     try {
@@ -187,8 +219,8 @@
       const s = pc && pc.iceConnectionState;
       if (!s) return;
       if (s === "checking") setIce("Estabelecendo conexão... (use um pouco de paciência).");
-      else if (s === "connected") setIce("Conectado (P2P direto).");
-      else if (s === "completed") setIce("Conectado (P2P).");
+      else if (s === "connected") { setIce("Conectado (P2P direto)."); startStats(); }
+      else if (s === "completed") { setIce("Conectado (P2P)."); startStats(); }
       else if (s === "failed") {
         setIce("Falha de conexão entre os PCs. Tente novamente.", "bad");
         setStatus("Não foi possível transmitir o vídeo.", "bad");
@@ -257,7 +289,14 @@
 
     setupSignaling(roomCode, true);
     setupPc();
-    pc.addTrack(myStream.getVideoTracks()[0]);
+    try {
+      pc.addTransceiver(myStream.getVideoTracks()[0], {
+        streams: [myStream],
+        sendEncodings: [{ maxBitrate: 5000000, maxFramerate: 30 }]
+      });
+    } catch (e) {
+      pc.addTrack(myStream.getVideoTracks()[0]);
+    }
     refreshStop();
   }
 
@@ -273,6 +312,7 @@
 
   function stopAll() {
     if (heartbeat) { clearInterval(heartbeat); heartbeat = null; }
+    stopStats();
     if (pc) { pc.close(); pc = null; }
     if (myStream) { myStream.getTracks().forEach((t) => t.stop()); myStream = null; }
     if (mq) { try { mq.end(true); } catch (e) {} mq = null; }
@@ -290,6 +330,7 @@
 
   window.addEventListener("beforeunload", () => {
     if (heartbeat) clearInterval(heartbeat);
+    stopStats();
     if (pc) pc.close();
     if (myStream) myStream.getTracks().forEach((t) => t.stop());
     if (mq) { try { mq.end(true); } catch (e) {} }
