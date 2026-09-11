@@ -31,6 +31,8 @@
   video { width:100%; aspect-ratio:16/9; display:block; background:#000; object-fit:contain; }
   .tag { position:absolute; top:10px; left:10px; background:rgba(0,0,0,.6); color:var(--muted); font-size:12px; padding:4px 10px; border-radius:6px; letter-spacing:1px; }
   .full { position:absolute; top:10px; right:10px; background:rgba(0,0,0,.6); color:var(--text); border:0; border-radius:6px; padding:5px 12px; cursor:pointer; font-size:12px; }
+  .ice { margin-top:10px; color:var(--muted); font-size:12px; line-height:1.6; }
+  .ice.ok { color:var(--green); }
   .note { margin-top:18px; color:var(--muted); font-size:12px; line-height:1.7; text-align:center; }
 </style>
 </head>
@@ -49,23 +51,25 @@
       <button class="btn-stop" onclick="stopAll()">Encerrar sessão</button>
     </div>
     <div id="status" class="status">Digite um código e escolha transmitir ou assistir.</div>
+    <div id="iceline" class="ice"></div>
   </div>
 
   <div class="videos">
     <div class="video-card hidden" id="cardBroadcast">
-      <video id="preview" muted playsinline></video>
+      <video id="preview" autoplay muted playsinline></video>
       <div class="tag">SUA TELA (sua transmissão)</div>
       <button class="full" onclick="fullscreen('preview')">&#10530;</button>
     </div>
     <div class="video-card hidden" id="cardView">
-      <video id="view" muted playsinline></video>
+      <video id="view" autoplay muted playsinline></video>
       <div class="tag">TELA DO AMIGO</div>
       <button class="full" onclick="fullscreen('view')">&#10530;</button>
     </div>
   </div>
 
   <p class="note">
-    O vídeo vai direto de PC para PC (não passa por servidor de vídeo).<br>
+    O vídeo tenta ir direto de PC para PC (P2P). Se a rede bloquear, ele passa por uma
+    retransmissão gratuita (TURN).<br>
     Cuidado: a tela inteira é transmitida — feche o que não quiser mostrar.
   </p>
 </div>
@@ -75,7 +79,10 @@
   const $ = (id) => document.getElementById(id);
   const ICE = { iceServers: [
     { urls: ["stun:stun.l.google.com:19302", "stun:stun1.l.google.com:19302"] },
-    { urls: "stun:global.stun.twilio.com:3478" }
+    { urls: "stun:global.stun.twilio.com:3478" },
+    { urls: "turn:openrelay.metered.ca:80", username: "openrelayproject", credential: "openrelayproject" },
+    { urls: "turn:openrelay.metered.ca:443", username: "openrelayproject", credential: "openrelayproject" },
+    { urls: "turn:openrelay.metered.ca:443?transport=tcp", username: "openrelayproject", credential: "openrelayproject" }
   ] };
 
   let pc = null;
@@ -84,13 +91,12 @@
   let myId = null;
   let topic = null;
   let role = null;
-  let polite = true;
-  let makingOffer = false;
-  let ignoreOffer = false;
+  let pendingCands = [];
+  let gotAnswer = false;
+  let gotOffer = false;
+  let heartbeat = null;
 
-  function cleanCode(raw) {
-    return (raw || "").toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 12);
-  }
+  function cleanCode(raw) { return (raw || "").toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 12); }
 
   function setStatus(msg, cls) {
     const s = $("status");
@@ -98,9 +104,13 @@
     s.innerHTML = msg;
   }
 
-  function refreshStop() {
-    $("stopWrap").style.display = pc ? "flex" : "none";
+  function setIce(msg, cls) {
+    const i = $("iceline");
+    i.className = "ice " + (cls || "");
+    i.textContent = msg;
   }
+
+  function refreshStop() { $("stopWrap").style.display = pc ? "flex" : "none"; }
 
   function fullscreen(id) {
     const el = $(id);
@@ -108,67 +118,86 @@
     else if (el.requestFullscreen) el.requestFullscreen();
   }
 
-  function sendSignal(data) {
+  function sendSignal(kind, data) {
     if (mq && mq.connected && topic) {
-      mq.publish(topic, JSON.stringify({ sender: myId, sig: data }), { qos: 1 });
+      mq.publish(topic, JSON.stringify({ sender: myId, kind: kind, data: data }), { qos: 1 });
     }
   }
 
-  async function makeOffer() {
+  function onSignal(msg) {
+    if (role === "host") {
+      if (msg.kind === "join") {
+        hostSendOffer();
+      } else if (msg.kind === "answer") {
+        gotAnswer = true;
+        try { pc.setRemoteDescription(msg.data); flushCands(); } catch (e) {}
+        setStatus("Alguém conectou! Transmitindo ao vivo.", "ok");
+      } else if (msg.kind === "cand") {
+        if (pc && pc.remoteDescription) pc.addIceCandidate(msg.data).catch(() => {});
+        else pendingCands.push(msg.data);
+      }
+    } else {
+      if (msg.kind === "offer") {
+        gotOffer = true;
+        if (heartbeat) { clearInterval(heartbeat); heartbeat = null; }
+        (async () => {
+          try {
+            await pc.setRemoteDescription(msg.data);
+            flushCands();
+            const ans = await pc.createAnswer();
+            await pc.setLocalDescription(ans);
+            sendSignal("answer", pc.localDescription);
+          } catch (e) {}
+        })();
+      } else if (msg.kind === "cand") {
+        if (pc && pc.remoteDescription) pc.addIceCandidate(msg.data).catch(() => {});
+        else pendingCands.push(msg.data);
+      }
+    }
+  }
+
+  function flushCands() {
+    const c = pendingCands.splice(0, pendingCands.length);
+    c.forEach((x) => pc.addIceCandidate(x).catch(() => {}));
+  }
+
+  async function hostSendOffer() {
+    if (!pc || role !== "host") return;
     try {
       await pc.setLocalDescription();
-    } catch (e) { return; }
-    sendSignal({ description: pc.localDescription });
-  }
-
-  async function handleSignal(sig) {
-    if (!pc) return;
-    if (sig.description) {
-      const offerCollision = sig.description.type === "offer" && (makingOffer || pc.signalingState !== "stable");
-      ignoreOffer = !polite && offerCollision;
-      if (ignoreOffer) return;
-      try {
-        await pc.setRemoteDescription(sig.description);
-      } catch (e) { return; }
-      if (sig.description.type === "offer") {
-        await makeOffer();
-      }
-    } else if (sig.candidate) {
-      try {
-        await pc.addIceCandidate(sig.candidate);
-      } catch (e) {}
-    }
+      sendSignal("offer", pc.localDescription);
+      setStatus("Sala criada. Aguardando seu amigo entrar...");
+    } catch (e) {}
   }
 
   function setupPc() {
     pc = new RTCPeerConnection(ICE);
-    pc.onicecandidate = (e) => {
-      if (e.candidate) sendSignal({ candidate: e.candidate });
-    };
+    pc.onicecandidate = (e) => { if (e.candidate) sendSignal("cand", e.candidate); };
     pc.ontrack = (e) => {
       const v = $("view");
+      v.muted = true;
       v.srcObject = e.streams[0];
       $("cardView").classList.remove("hidden");
-      v.play();
+      v.play().catch(() => {});
       setStatus("Conectado! Assistindo ao vivo.", "ok");
+      setIce("Transmitindo entre os PCs.", "ok");
       refreshStop();
     };
-    pc.onconnectionstatechange = () => {
-      const s = pc.connectionState;
-      if (s === "disconnected" || s === "failed" || s === "closed") {
-        if (!$("cardView").classList.contains("hidden")) {
-          setStatus("Conexão encerrada. Você pode tentar novamente.", "bad");
-        }
-      }
-    };
-    pc.onnegotiationneeded = async () => {
-      await makeOffer();
+    pc.oniceconnectionstatechange = () => {
+      const s = pc && pc.iceConnectionState;
+      if (!s) return;
+      if (s === "checking") setIce("Estabelecendo conexão... (use um pouco de paciência).");
+      else if (s === "connected") setIce("Conectado (P2P direto).");
+      else if (s === "completed") setIce("Conectado (P2P).");
+      else if (s === "failed") {
+        setIce("Falha de conexão entre os PCs. Tente novamente.", "bad");
+        setStatus("Não foi possível transmitir o vídeo.", "bad");
+      } else if (s === "disconnected") setIce("Conexão instável...", "");
     };
   }
 
   function setupSignaling(roomCode, isHost) {
     role = isHost ? "host" : "guest";
-    polite = isHost;
     topic = "screenlive/" + roomCode.toLowerCase() + "/json";
     myId = "sl" + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
 
@@ -182,11 +211,19 @@
 
     mq.on("connect", () => {
       mq.subscribe(topic, { qos: 1 }, () => {
-        if (pc && !pc.remoteDescription) makeOffer();
+        if (role === "host") {
+          if (pc) setTimeout(hostSendOffer, 300);
+        } else {
+          heartbeat = setInterval(() => {
+            if (gotOffer || !mq || !mq.connected) return;
+            sendSignal("join", true);
+          }, 3000);
+          sendSignal("join", true);
+        }
       });
       setStatus(role === "host"
-        ? `Sala <span class="code">${roomCode}</span> criada. Mande só este código para seu amigo. Aguardando...`
-        : `Procurando a sala <span class="code">${roomCode}</span>... Se o amigo ainda não começou, espere um instante.`, "");
+        ? `Sala <span class="code">${roomCode}</span> criada. Mande só este código para seu amigo.`
+        : `Procurando a sala <span class="code">${roomCode}</span>...`, "");
       refreshStop();
     });
     mq.on("reconnect", () => setStatus("Servidor de sinalização: tentando reconectar...", ""));
@@ -195,16 +232,13 @@
       let msg;
       try { msg = JSON.parse(payload.toString()); } catch (e) { return; }
       if (msg.sender === myId) return;
-      handleSignal(msg.sig);
+      onSignal(msg);
     });
   }
 
   async function startBroadcast() {
     const roomCode = cleanCode($("code").value);
-    if (roomCode.length < 4) {
-      setStatus("Digite um código de sala com pelo menos 4 letras ou números.", "bad");
-      return;
-    }
+    if (roomCode.length < 4) { setStatus("Digite um código com pelo menos 4 letras ou números.", "bad"); return; }
     try {
       myStream = await navigator.mediaDevices.getDisplayMedia({ video: { frameRate: { ideal: 30 } }, audio: false });
     } catch (e) {
@@ -215,7 +249,7 @@
     const pv = $("preview");
     pv.srcObject = myStream;
     $("cardBroadcast").classList.remove("hidden");
-    await pv.play();
+    pv.play().catch(() => {});
     myStream.getVideoTracks()[0].addEventListener("ended", () => {
       setStatus("Transmissão encerrada (você parou o compartilhamento).", "bad");
       stopAll();
@@ -229,10 +263,7 @@
 
   function startWatching() {
     const roomCode = cleanCode($("code").value);
-    if (roomCode.length < 4) {
-      setStatus("Digite o código da sala que você quer assistir.", "bad");
-      return;
-    }
+    if (roomCode.length < 4) { setStatus("Digite o código da sala que você quer assistir.", "bad"); return; }
     $("code").value = "";
     setupSignaling(roomCode, false);
     setupPc();
@@ -241,19 +272,24 @@
   }
 
   function stopAll() {
+    if (heartbeat) { clearInterval(heartbeat); heartbeat = null; }
     if (pc) { pc.close(); pc = null; }
     if (myStream) { myStream.getTracks().forEach((t) => t.stop()); myStream = null; }
     if (mq) { try { mq.end(true); } catch (e) {} mq = null; }
+    gotAnswer = false; gotOffer = false;
+    pendingCands = [];
     $("code").value = "";
     $("cardBroadcast").classList.add("hidden");
     $("cardView").classList.add("hidden");
     $("preview").srcObject = null;
     $("view").srcObject = null;
     setStatus("Sessão encerrada.");
+    setIce("");
     refreshStop();
   }
 
   window.addEventListener("beforeunload", () => {
+    if (heartbeat) clearInterval(heartbeat);
     if (pc) pc.close();
     if (myStream) myStream.getTracks().forEach((t) => t.stop());
     if (mq) { try { mq.end(true); } catch (e) {} }
