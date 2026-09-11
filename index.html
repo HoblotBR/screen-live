@@ -11,8 +11,10 @@
   body { background:var(--bg); color:var(--text); font-family:"gg sans","Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif; display:flex; flex-direction:column; overflow:hidden; }
 
   .app { flex:1; display:grid; grid-template-columns:72px 240px 1fr 240px; min-height:0; }
-  @media (max-width:1200px) { .app { grid-template-columns:72px 240px 1fr; } .members { display:none; } }
+  @media (max-width:1200px) { .app { grid-template-columns:72px 240px 1fr; } .members { display:none; } .voicebar { display:flex; } }
   @media (max-width:860px)  { .app { grid-template-columns:72px 1fr; } .channels { display:none; } }
+
+  .voicebar { display:none; }
 
   /* ===== Barra de servidores ===== */
   .rail { background:var(--bg3); display:flex; flex-direction:column; align-items:center; padding:12px 0; gap:8px; overflow-y:auto; }
@@ -24,10 +26,11 @@
   .rail-spacer { flex:1; }
   .icon-btn svg { width:24px; height:24px; }
 
-  /* ===== Canais ===== */
+  /* ===== Sidebar esquerdo: canais + online + usuário logado ===== */
   .channels { background:var(--bg2); display:flex; flex-direction:column; min-height:0; }
   .server-name { height:48px; flex:none; display:flex; align-items:center; justify-content:space-between; padding:0 16px; font-weight:700; font-size:15px; color:#fff; border-bottom:1px solid var(--border); box-shadow:0 1px 0 #1e1f22; }
-  .chan-section { font-size:11px; font-weight:700; color:var(--muted); padding:18px 8px 4px; letter-spacing:.4px; }
+  .nav-wrap { flex:none; }
+  .chan-section { font-size:11px; font-weight:700; color:var(--muted); padding:14px 8px 4px; letter-spacing:.4px; }
   .chan { display:flex; align-items:center; gap:8px; padding:6px 8px; margin:1px 8px; border-radius:4px; color:var(--muted); font-size:15px; cursor:pointer; white-space:nowrap; }
   .chan:hover { background:var(--hl); color:#dbdee1; }
   .chan.active { background:var(--act); color:#fff; }
@@ -35,7 +38,20 @@
   .chan svg { width:18px; height:18px; flex:none; }
   .chan.voice.active svg { color:var(--green); }
   .chan.voice.locked::after { content:"\1F512"; margin-left:auto; font-size:13px; }
-  .channels-foot { margin-top:auto; padding:10px 12px; font-size:11px; color:var(--muted); line-height:1.5; }
+
+  .users-section { flex:1; min-height:0; overflow-y:auto; padding:10px 8px 8px; border-top:1px solid var(--border); margin-top:10px; }
+  .m-title { font-size:11px; font-weight:700; color:var(--muted); letter-spacing:.4px; padding:6px 8px 4px; }
+  .member-row { display:flex; align-items:center; gap:10px; padding:6px 8px; border-radius:4px; }
+  .member-row:hover { background:var(--hl); }
+  .avatar { width:32px; height:32px; border-radius:50%; flex:none; background:linear-gradient(135deg,#5865f2,#9b59b6); display:flex; align-items:center; justify-content:center; color:#fff; font-size:13px; font-weight:700; position:relative; }
+  .avatar .sdot { position:absolute; bottom:-2px; right:-2px; width:12px; height:12px; border-radius:50%; background:var(--green); border:3px solid var(--bg2); }
+  .member-name { font-size:14px; font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .member-empty { padding:6px 8px; font-size:12.5px; color:var(--muted); }
+
+  .user-footer { flex:none; display:flex; align-items:center; gap:10px; padding:10px 8px; background:#232428; border-top:1px solid var(--border); }
+  .user-footer-info { display:flex; flex-direction:column; line-height:1.25; min-width:0; }
+  .user-footer-name { font-size:14px; font-weight:600; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .user-footer-status { font-size:11.5px; color:var(--green); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 
   /* ===== Principal ===== */
   .main { background:var(--bg); display:flex; flex-direction:column; min-height:0; }
@@ -82,25 +98,13 @@
   .btn-watch { background:#4e5058; color:#fff; } .btn-watch:hover { background:#6d6f78; }
   .btn-stop { background:#404249; color:var(--red); border:1px solid var(--red); } .btn-stop:hover { background:var(--red); color:#fff; }
 
-  /* ===== Membros ===== */
-  .members { background:var(--bg2); border-left:1px solid var(--border); overflow-y:auto; padding:14px 8px; }
-  .members-title { font-size:11px; font-weight:700; color:var(--muted); letter-spacing:.4px; padding:8px; }
-  .member-row { display:flex; align-items:center; gap:10px; padding:6px 8px; border-radius:4px; }
-  .member-row:hover { background:var(--hl); }
-  .avatar { width:32px; height:32px; border-radius:50%; flex:none; background:linear-gradient(135deg,#5865f2,#9b59b6); display:flex; align-items:center; justify-content:center; color:#fff; font-size:13px; font-weight:700; position:relative; }
-  .avatar .sdot { position:absolute; bottom:-2px; right:-2px; width:12px; height:12px; border-radius:50%; background:var(--green); border:3px solid var(--bg2); }
-  .member-name { font-size:14px; font-weight:500; }
-  .member-note { padding:4px 8px; font-size:12.5px; color:var(--muted); line-height:1.5; }
-
-  /* ===== Barra de voz ===== */
-  .voicebar { height:52px; flex:none; background:#232428; display:flex; align-items:center; justify-content:space-between; padding:0 8px; border-top:1px solid #1e1f22; }
-  .vb-left { display:flex; align-items:center; gap:10px; padding:4px 6px; border-radius:4px; cursor:pointer; }
-  .vb-left:hover { background:var(--hl); }
-  .vb-info { display:flex; flex-direction:column; line-height:1.25; }
-  .vb-name { font-size:14px; font-weight:600; color:#fff; }
-  .vb-status { font-size:11.5px; color:var(--green); }
-  .vb-icons { display:flex; gap:4px; align-items:center; }
-  .vb-icon { width:32px; height:32px; border:0; border-radius:4px; background:transparent; display:flex; align-items:center; justify-content:center; color:#b5bac1; cursor:pointer; }
+  /* ===== Painel direito: AO VIVO + participantes + controles fixos ===== */
+  .members { background:var(--bg2); border-left:1px solid var(--border); display:flex; flex-direction:column; min-height:0; }
+  .members-head { flex:none; padding:12px 8px 4px; font-size:12px; font-weight:700; color:#fff; letter-spacing:.4px; border-bottom:1px solid var(--border); }
+  .members-head .live-count { color:var(--muted); }
+  .part-list { flex:1; min-height:0; overflow-y:auto; padding:8px; }
+  .controls-footer { flex:none; display:flex; align-items:center; justify-content:center; gap:6px; padding:10px 8px; background:#232428; border-top:1px solid var(--border); }
+  .vb-icon { width:34px; height:34px; border:0; border-radius:4px; background:transparent; display:flex; align-items:center; justify-content:center; color:#b5bac1; cursor:pointer; }
   .vb-icon:hover { background:#3f4147; color:#dbdee1; }
   .vb-icon.red:hover { background:var(--red); color:#fff; }
   .vb-icon svg { width:20px; height:20px; }
@@ -135,7 +139,6 @@
   .modal-card input:focus { border-color:var(--blurple); }
   .modal-actions { display:flex; gap:10px; margin-top:18px; justify-content:flex-end; }
   .modal-actions .discord-btn { flex:1; }
-  .modal-note { font-size:12px; color:var(--muted); margin-top:8px; }
 
   .well { background:#1e1f22; border:1px solid var(--border); border-radius:8px; padding:12px; margin-top:14px; font-size:13.5px; color:#b5bac1; line-height:1.7; }
   .well b { color:#fff; }
@@ -179,20 +182,35 @@
     <button class="icon-btn" title="Sair da conta" onclick="localStorage.removeItem('screlive_name'); location.reload();"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M2 21V3l20 9z"/></svg></button>
   </nav>
 
-  <!-- Canais -->
+  <!-- Sidebar esquerdo -->
   <aside class="channels">
     <div class="server-name">SCREENLIVE <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M7 10l5 5 5-5z"/></svg></div>
 
-    <div class="chan-section">INFORMAÇÕES</div>
-    <div class="chan" id="chanTutorial" onclick="openHowTo()"><span class="hash">#</span> como-funciona</div>
+    <div class="nav-wrap">
+      <div class="chan-section">INFORMAÇÕES</div>
+      <div class="chan" id="chanTutorial" onclick="openHowTo()"><span class="hash">#</span> como-funciona</div>
 
-    <div class="chan-section">AO VIVO</div>
-    <div class="chan voice locked" id="chanSala" onclick="enterSala()"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a5 5 0 0 0-5 5v5a5 5 0 0 0 10 0V7a5 5 0 0 0-5-5zM4 12a8 8 0 0 0 16 0h-2a6 6 0 1 1-11.3 0H4z"/></svg> Sala ao vivo</div>
+      <div class="chan-section">AO VIVO</div>
+      <div class="chan voice locked" id="chanSala" onclick="enterSala()"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a5 5 0 0 0-5 5v5a5 5 0 0 0 10 0V7a5 5 0 0 0-5-5zM4 12a8 8 0 0 0 16 0h-2a6 6 0 1 1-11.3 0H4z"/></svg> Sala ao vivo</div>
+    </div>
 
-    <div class="channels-foot">Só entra na sala quem tem a senha de 4 dígitos.</div>
+    <!-- Lista de usuários online (ocupa o espaço livre) -->
+    <div class="users-section">
+      <div class="m-title">ONLINE — <span id="onlineCount">0</span></div>
+      <div id="userList"></div>
+    </div>
+
+    <!-- Usuário logado: fixo no rodapé -->
+    <div class="user-footer">
+      <div class="avatar" id="vbAvatar"><span class="sdot"></span>V</div>
+      <div class="user-footer-info">
+        <div class="user-footer-name" id="vbName">VOCÊ</div>
+        <div class="user-footer-status" id="vbStatus">Ocioso</div>
+      </div>
+    </div>
   </aside>
 
-  <!-- Principal -->
+  <!-- Conteúdo central -->
   <main class="main">
     <div class="main-header">
       <div class="chan-title"><span class="hash">#</span> transmissao-ao-vivo</div>
@@ -233,29 +251,37 @@
     </div>
   </main>
 
-  <!-- Membros -->
+  <!-- Painel direito -->
   <aside class="members">
-    <div class="members-title" id="membersTitle">AO VIVO — 0</div>
-    <div id="memberList"></div>
-    <div class="member-note">Mostra apenas quem entrou na sala ao vivo.</div>
+    <div class="members-head">AO VIVO — <span class="live-count" id="liveCount">0</span></div>
+
+    <!-- Participantes (conteúdo) -->
+    <div class="m-title" style="padding-top:10px">PARTICIPANTES</div>
+    <div class="part-list" id="memberList"></div>
+
+    <!-- Controles fixos no rodapé -->
+    <div class="controls-footer">
+      <button class="vb-icon" title="Microfone" onclick="toggleIcon(this)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a5 5 0 0 0-5 5v5a5 5 0 0 0 10 0V7a5 5 0 0 0-5-5zM4 12a8 8 0 0 0 16 0h-2a6 6 0 1 1-11.3 0H4z"/></svg></button>
+      <button class="vb-icon" title="Fones de ouvido" onclick="toggleIcon(this)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 12a9 9 0 0 1 18 0v6a3 3 0 0 1-3 3h-2v-8h2v2h1V12a7 7 0 0 0-14 0v3h1v8H6a3 3 0 0 1-3-3z"/></svg></button>
+      <button class="vb-icon red" title="Desconectar" onclick="location.reload()"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 4l4 4h-3v3l-2-2v-1H9zm4 4v2.9a4 4 0 1 1-8 0V10h2v2.9a2 2 0 1 0 4 0V10z"/></svg></button>
+      <button class="vb-icon" title="Configurações"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.4 13a7.6 7.6 0 0 0 0-2l2-1.5-2-3.4-2.3 1a7.6 7.6 0 0 0-1.7-1L15 3.5h-4l-.4 2.6a7.6 7.6 0 0 0-1.7 1l-2.3-1-2 3.4 2 1.5a7.6 7.6 0 0 0 0 2l-2 1.5 2 3.4 2.3-1a7.6 7.6 0 0 0 1.7 1l.4 2.6h4l.4-2.6a7.6 7.6 0 0 0 1.7-1l2.3 1 2-3.4zM13 15.5A3.5 3.5 0 1 1 13 8a3.5 3.5 0 0 1 0 7.5z"/></svg></button>
+    </div>
   </aside>
 </div>
 
-<!-- Barra de voz -->
+<!-- Barra compacta (telas pequenas) -->
 <footer class="voicebar">
-  <div class="vb-left">
-    <div class="avatar" id="vbAvatar"><span class="sdot"></span>V</div>
-    <div class="vb-info">
-      <span class="vb-name" id="vbName">VOCÊ</span>
-      <span class="vb-status" id="vbStatus">Ocioso</span>
+  <div class="user-footer" style="flex:1;border-top:0;justify-content:flex-start">
+    <div class="avatar" id="vbAvatarM"><span class="sdot"></span>V</div>
+    <div class="user-footer-info">
+      <div class="user-footer-name" id="vbNameM">VOCÊ</div>
+      <div class="user-footer-status" id="vbStatusM">Ocioso</div>
     </div>
   </div>
-  <div style="display:flex; align-items:center; gap:10px;">
-    <button class="vb-icon" title="Microfone" onclick="toggleIcon(this)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a5 5 0 0 0-5 5v5a5 5 0 0 0 10 0V7a5 5 0 0 0-5-5zM4 12a8 8 0 0 0 16 0h-2a6 6 0 1 1-11.3 0H4z"/></svg></button>
-    <button class="vb-icon" title="Fones de ouvido" onclick="toggleIcon(this)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 12a9 9 0 0 1 18 0v6a3 3 0 0 1-3 3h-2v-8h2v2h1V12a7 7 0 0 0-14 0v3h1v8H6a3 3 0 0 1-3-3z"/></svg></button>
-    <button class="vb-icon red" title="Desconectar" onclick="location.reload()"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 4l4 4h-3v3l-2-2v-1H9zm4 4v2.9a4 4 0 1 1-8 0V10h2v2.9a2 2 0 1 0 4 0V10z"/></svg></button>
-    <div style="opacity:.4">|</div>
-    <button class="vb-icon" title="Configurações"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.4 13a7.6 7.6 0 0 0 0-2l2-1.5-2-3.4-2.3 1a7.6 7.6 0 0 0-1.7-1L15 3.5h-4l-.4 2.6a7.6 7.6 0 0 0-1.7 1l-2.3-1-2 3.4 2 1.5a7.6 7.6 0 0 0 0 2l-2 1.5 2 3.4 2.3-1a7.6 7.6 0 0 0 1.7 1l.4 2.6h4l.4-2.6a7.6 7.6 0 0 0 1.7-1l2.3 1 2-3.4zM13 15.5A3.5 3.5 0 1 1 13 8a3.5 3.5 0 0 1 0 7.5z"/></svg></button>
+  <div style="display:flex; align-items:center; gap:4px; padding:0 8px;">
+    <button class="vb-icon" onclick="toggleIcon(this)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a5 5 0 0 0-5 5v5a5 5 0 0 0 10 0V7a5 5 0 0 0-5-5zM4 12a8 8 0 0 0 16 0h-2a6 6 0 1 1-11.3 0H4z"/></svg></button>
+    <button class="vb-icon" onclick="toggleIcon(this)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 12a9 9 0 0 1 18 0v6a3 3 0 0 1-3 3h-2v-8h2v2h1V12a7 7 0 0 0-14 0v3h1v8H6a3 3 0 0 1-3-3z"/></svg></button>
+    <button class="vb-icon red" onclick="location.reload()"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 4l4 4h-3v3l-2-2v-1H9zm4 4v2.9a4 4 0 1 1-8 0V10h2v2.9a2 2 0 1 0 4 0V10z"/></svg></button>
   </div>
 </footer>
 
@@ -298,6 +324,8 @@
     $("loginOverlay").classList.add("hidden");
     $("vbName").textContent = n;
     $("vbAvatar").textContent = n.charAt(0).toUpperCase();
+    $("vbNameM").textContent = n;
+    $("vbAvatarM").textContent = n.charAt(0).toUpperCase();
     renderMembers();
   }
 
@@ -362,26 +390,37 @@
     if (modalResolver) { const r = modalResolver; modalResolver = null; r(null); }
   }
 
-  /* ===== Membros ===== */
+  /* ===== Membros / participantes ===== */
+  function makeMemberRow(name, id) {
+    const row = document.createElement("div");
+    row.className = "member-row";
+    const a = document.createElement("div");
+    a.className = "avatar";
+    a.innerHTML = '<span class="sdot"></span>' + (name.charAt(0) || "?").toUpperCase();
+    const s = document.createElement("span");
+    s.className = "member-name";
+    s.textContent = (id === myId) ? name + " (você)" : name;
+    row.append(a, s);
+    return row;
+  }
+
   function renderMembers() {
-    const list = $("memberList");
-    list.innerHTML = "";
-    $("membersTitle").textContent = "AO VIVO — " + members.size;
-    if (members.size === 0) {
-      list.innerHTML = '<div style="padding:8px;font-size:13px;color:var(--muted)">Ninguém na sala ainda.</div>';
+    const ul = $("userList");
+    const pl = $("memberList");
+    ul.innerHTML = "";
+    pl.innerHTML = "";
+    const n = members.size;
+    $("onlineCount").textContent = n;
+    $("liveCount").textContent = n;
+    if (n === 0) {
+      ul.innerHTML = '<div class="member-empty">Ninguém na sala ainda.</div>';
+      pl.innerHTML = '<div class="member-empty">Ninguém na sala ainda.</div>';
       return;
     }
     members.forEach((name, id) => {
-      const row = document.createElement("div");
-      row.className = "member-row";
-      const a = document.createElement("div");
-      a.className = "avatar";
-      a.innerHTML = '<span class="sdot"></span>' + (name.charAt(0) || "?").toUpperCase();
-      const s = document.createElement("span");
-      s.className = "member-name";
-      s.textContent = (id === myId) ? name + " (você)" : name;
-      row.append(a, s);
-      list.append(row);
+      const row = makeMemberRow(name, id);
+      ul.appendChild(row);
+      pl.appendChild(makeMemberRow(name, id));
     });
   }
 
@@ -411,8 +450,20 @@
     $("salaCode").textContent = roomPassword || "—";
     $("liveDot").classList.toggle("on", !!roomPassword);
     $("chanSala").classList.toggle("active", !!roomPassword);
-    const vs = $("vbStatus");
-    if (vs && !roomPassword) vs.textContent = "Ocioso";
+    const st = roomPassword ? ("Na sala " + roomPassword) : "Ocioso";
+    if (role === "host") {
+      setBothStatus("Transmitindo minha tela");
+    } else if (role === "guest") {
+      setBothStatus("Assistindo ao vivo");
+    } else {
+      setBothStatus(st);
+    }
+  }
+
+  function setBothStatus(txt) {
+    const a = $("vbStatus"), b = $("vbStatusM");
+    if (a) a.textContent = txt;
+    if (b) b.textContent = txt;
   }
 
   function fullscreen(id) {
@@ -520,8 +571,7 @@
         if (pc && role === "guest") startGuestHeartbeat();
       });
       setStatus(`Você entrou na sala <span class="code">${code}</span>. Escolha transmitir ou assistir.`, "ok");
-      const vs = $("vbStatus");
-      if (vs) vs.textContent = "Na sala " + code;
+      setBothStatus("Na sala " + code);
       refreshStop();
     });
     mq.on("reconnect", () => setStatus("Servidor de sinalização: tentando reconectar...", ""));
@@ -681,8 +731,7 @@
       const s = myStream.getVideoTracks()[0].getSettings();
       setIce(`Capturando tela ${s.width}x${s.height}${s.frameRate ? " @" + Math.round(s.frameRate) + "fps" : ""}.`, "ok");
     } catch (e) {}
-    const vs = $("vbStatus");
-    if (vs) vs.textContent = "Transmitindo minha tela";
+    setBothStatus("Transmitindo minha tela");
     if (mq && mq.connected) hostSendOffer();
     refreshStop();
   }
@@ -701,8 +750,7 @@
     setupPc();
     pc.addTransceiver("video", { direction: "recvonly" });
     setCodecPrefs();
-    const vs = $("vbStatus");
-    if (vs) vs.textContent = "Assistindo a sala " + roomCode;
+    setBothStatus("Assistindo ao vivo");
     if (mq && mq.connected) startGuestHeartbeat();
     refreshStop();
   }
@@ -719,9 +767,8 @@
     respondedTo.clear();
     renderMembers();
     roomPassword = "";
+    role = null;
     writeChips();
-    const vs = $("vbStatus");
-    if (vs) vs.textContent = "Ocioso";
     $("cardBroadcast").classList.add("hidden");
     $("cardView").classList.add("hidden");
     $("preview").srcObject = null;
