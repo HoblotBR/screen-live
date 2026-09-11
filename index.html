@@ -5,74 +5,209 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Screen Live — Compartilhe sua tela</title>
 <style>
-  :root { --bg:#0b0f14; --card:#141a22; --border:#242e3b; --text:#e8eef5; --muted:#8aa0b8; --accent:#22d3ee; --green:#34d399; --red:#f87171; }
+  :root { --bg:#313338; --bg2:#2b2d31; --bg3:#1e1f22; --border:#26282c; --hl:#35373c; --act:#404249; --text:#dbdee1; --muted:#949ba4; --blurple:#5865f2; --blurple2:#4752c4; --green:#23a559; --red:#f23f43; }
   * { box-sizing:border-box; margin:0; padding:0; }
-  body { background:radial-gradient(1200px 600px at 50% -100px,#122336 0%,var(--bg) 60%); color:var(--text); font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif; min-height:100vh; padding:32px 16px; }
-  .wrap { max-width:920px; margin:0 auto; }
-  h1 { text-align:center; font-size:34px; letter-spacing:2px; }
-  h1 .dot { color:var(--red); }
-  p.sub { text-align:center; color:var(--muted); margin:8px 0 24px; font-size:14px; }
-  .panel { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:18px; }
-  .row { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:8px; }
-  input { flex:1; min-width:220px; background:#0d131b; border:1px solid var(--border); color:var(--text); padding:13px 14px; border-radius:10px; font-size:16px; letter-spacing:2px; text-transform:uppercase; }
-  input:focus { outline:2px solid var(--accent); border-color:transparent; }
-  button { border:0; border-radius:10px; padding:13px 18px; font-size:15px; font-weight:700; cursor:pointer; color:#03121a; }
-  .btn-transmit { background:var(--green); flex:1; }
-  .btn-watch { background:var(--accent); flex:1; }
-  .btn-stop { background:var(--red); color:#fff; }
-  .status { margin:12px 0 0; color:var(--muted); min-height:22px; font-size:14px; line-height:1.5; }
-  .status.ok { color:var(--green); }
-  .status.bad { color:var(--red); }
-  .code { color:var(--accent); font-weight:700; letter-spacing:2px; }
-  .videos { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
-  @media (max-width:700px){ .videos { grid-template-columns:1fr; } }
-  .video-card { background:#000; border:1px solid var(--border); border-radius:12px; overflow:hidden; position:relative; }
+  html, body { height:100%; }
+  body { background:var(--bg); color:var(--text); font-family:"gg sans","Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif; display:flex; flex-direction:column; overflow:hidden; }
+
+  .app { flex:1; display:grid; grid-template-columns:72px 240px 1fr 240px; min-height:0; }
+  @media (max-width:1200px) { .app { grid-template-columns:72px 240px 1fr; } .members { display:none; } }
+  @media (max-width:860px)  { .app { grid-template-columns:72px 1fr; } .channels { display:none; } }
+
+  /* ===== Barra de servidores (esquerda) ===== */
+  .rail { background:var(--bg3); display:flex; flex-direction:column; align-items:center; padding:12px 0; gap:8px; overflow-y:auto; }
+  .icon-btn { width:48px; height:48px; border-radius:24px; background:#313338; color:#dbdee1; display:flex; align-items:center; justify-content:center; cursor:pointer; border:0; transition:border-radius .15s ease, background .15s ease; flex:none; }
+  .icon-btn:hover { border-radius:16px; background:var(--blurple); color:#fff; }
+  .icon-btn.home { background:var(--blurple); color:#fff; border-radius:16px; position:relative; }
+  .icon-btn.server { background:var(--blurple); color:#fff; font-weight:700; font-size:16px; position:relative; }
+  .divider { width:32px; height:2px; background:#35373c; border-radius:1px; flex:none; }
+  .rail-spacer { flex:1; }
+  .icon-btn svg { width:24px; height:24px; }
+
+  /* ===== Lista de canais ===== */
+  .channels { background:var(--bg2); display:flex; flex-direction:column; min-height:0; }
+  .server-name { height:48px; flex:none; display:flex; align-items:center; justify-content:space-between; padding:0 16px; font-weight:700; font-size:15px; color:#fff; border-bottom:1px solid var(--border); box-shadow:0 1px 0 #1e1f22; cursor:pointer; }
+  .chan-section { font-size:11px; font-weight:700; color:var(--muted); padding:18px 8px 4px; letter-spacing:.4px; }
+  .chan { display:flex; align-items:center; gap:8px; padding:6px 8px; margin:1px 8px; border-radius:4px; color:var(--muted); font-size:15px; cursor:pointer; white-space:nowrap; }
+  .chan:hover { background:var(--hl); color:#dbdee1; }
+  .chan.active { background:var(--act); color:#fff; }
+  .chan .hash { font-size:18px; font-weight:400; color:#80848e; width:18px; text-align:center; }
+  .chan svg { width:18px; height:18px; flex:none; }
+  .chan.voice.active svg { color:var(--green); }
+  .channels-foot { margin-top:auto; padding:10px 12px; font-size:11px; color:var(--muted); line-height:1.5; }
+
+  /* ===== Área principal ===== */
+  .main { background:var(--bg); display:flex; flex-direction:column; min-height:0; }
+  .main-header { height:48px; flex:none; display:flex; align-items:center; gap:8px; padding:0 16px; border-bottom:1px solid var(--border); box-shadow:0 1px 0 #1e1f22; }
+  .chan-title { display:flex; align-items:center; gap:8px; font-size:15px; font-weight:700; }
+  .chan-title .hash { color:var(--muted); width:20px; text-align:center; }
+  .room-chip { margin-left:auto; display:flex; align-items:center; gap:8px; font-size:12.5px; color:var(--muted); background:#24262b; border:1px solid var(--border); border-radius:14px; padding:4px 12px; }
+  .live-dot { width:8px; height:8px; border-radius:50%; background:var(--green); }
+
+  .stage-status { flex:none; padding:8px 16px 0; min-height:20px; font-size:13px; color:var(--muted); line-height:1.5; }
+  .stage-status.ok { color:var(--green); }
+  .stage-status.bad { color:var(--red); }
+  .stage-status .code { color:#00a8fc; font-weight:600; }
+
+  .stage { flex:1; display:grid; grid-template-columns:1fr 1fr; gap:14px; padding:14px 16px; min-height:0; align-content:center; overflow:hidden; position:relative; }
+  @media (max-width:900px) { .stage { grid-template-columns:1fr; align-content:start; overflow-y:auto; } }
+  .video-card { background:#000; border-radius:8px; overflow:hidden; position:relative; aspect-ratio:16/9; box-shadow:0 2px 10px rgba(0,0,0,.35); }
   .video-card.hidden { display:none; }
-  video { width:100%; aspect-ratio:16/9; display:block; background:#000; object-fit:contain; }
-  .tag { position:absolute; top:10px; left:10px; background:rgba(0,0,0,.6); color:var(--muted); font-size:12px; padding:4px 10px; border-radius:6px; letter-spacing:1px; }
-  .full { position:absolute; top:10px; right:10px; background:rgba(0,0,0,.6); color:var(--text); border:0; border-radius:6px; padding:5px 12px; cursor:pointer; font-size:12px; }
-  .ice { margin-top:10px; color:var(--muted); font-size:12px; line-height:1.6; }
+  .stage:has(#cardBroadcast.hidden) #cardView:not(.hidden),
+  .stage:has(#cardView.hidden) #cardBroadcast:not(.hidden) { position:absolute; inset:14px 16px; grid-column:auto; aspect-ratio:auto; height:auto; }
+  video { width:100%; height:100%; display:block; background:#000; object-fit:contain; }
+  .tag { position:absolute; top:10px; left:10px; background:rgba(0,0,0,.65); color:var(--muted); font-size:12px; padding:4px 10px; border-radius:6px; letter-spacing:.5px; z-index:2; }
+  .full { position:absolute; top:8px; right:8px; background:rgba(0,0,0,.65); color:var(--text); border:0; border-radius:6px; padding:5px 12px; cursor:pointer; font-size:12px; z-index:2; }
+  .full:hover { background:rgba(0,0,0,.9); }
+
+  .empty { grid-column:1/-1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; text-align:center; padding:40px; }
+  .stage:has(.video-card:not(.hidden)) .empty { display:none; }
+  .empty .mic-circle { width:88px; height:88px; border-radius:50%; background:#26282c; display:flex; align-items:center; justify-content:center; color:#4e5058; }
+  .empty .mic-circle svg { width:40px; height:40px; }
+  .empty h3 { font-size:18px; font-weight:700; color:#dbdee1; }
+  .empty p { font-size:14px; color:var(--muted); max-width:380px; line-height:1.6; }
+
+  .ice { flex:none; padding:6px 16px 10px; font-size:12px; color:var(--muted); min-height:16px; line-height:1.6; }
   .ice.ok { color:var(--green); }
-  .note { margin-top:18px; color:var(--muted); font-size:12px; line-height:1.7; text-align:center; }
+  .ice.bad { color:var(--red); }
+
+  .controls { flex:none; margin:0 16px 12px; display:flex; align-items:center; gap:10px; background:#383a40; border-radius:8px; padding:6px 8px; }
+  .controls input { flex:1; min-width:80px; background:transparent; border:0; outline:none; color:var(--text); font-size:15px; text-transform:uppercase; letter-spacing:1px; font-family:inherit; padding:6px 8px; }
+  .controls input::placeholder { color:#6d6f78; text-transform:none; letter-spacing:0; }
+  .discord-btn { border:0; border-radius:4px; font-weight:600; font-size:14px; padding:9px 14px; cursor:pointer; font-family:inherit; flex:none; }
+  .btn-transmit { background:var(--blurple); color:#fff; } .btn-transmit:hover { background:var(--blurple2); }
+  .btn-watch { background:#4e5058; color:#fff; } .btn-watch:hover { background:#6d6f78; }
+  .btn-stop { background:#404249; color:var(--red); border:1px solid var(--red); } .btn-stop:hover { background:var(--red); color:#fff; }
+
+  /* ===== Membros (direita) ===== */
+  .members { background:var(--bg2); border-left:1px solid var(--border); overflow-y:auto; padding:14px 8px; }
+  .members-title { font-size:11px; font-weight:700; color:var(--muted); letter-spacing:.4px; padding:8px; }
+  .member-row { display:flex; align-items:center; gap:10px; padding:6px 8px; border-radius:4px; }
+  .member-row:hover { background:var(--hl); }
+  .avatar { width:32px; height:32px; border-radius:50%; flex:none; background:linear-gradient(135deg,#5865f2,#9b59b6); display:flex; align-items:center; justify-content:center; color:#fff; font-size:13px; font-weight:700; position:relative; }
+  .avatar .sdot { position:absolute; bottom:-2px; right:-2px; width:12px; height:12px; border-radius:50%; background:var(--green); border:3px solid var(--bg2); }
+  .member-name { font-size:15px; font-weight:500; }
+
+  /* ===== Barra de voz (embaixo) ===== */
+  .voicebar { height:52px; flex:none; background:#232428; display:flex; align-items:center; justify-content:space-between; padding:0 8px; border-top:1px solid #1e1f22; }
+  .vb-left { display:flex; align-items:center; gap:10px; padding:4px 6px; border-radius:4px; cursor:pointer; }
+  .vb-left:hover { background:var(--hl); }
+  .vb-info { display:flex; flex-direction:column; line-height:1.25; }
+  .vb-name { font-size:14px; font-weight:600; color:#fff; }
+  .vb-status { font-size:11.5px; color:var(--green); }
+  .vb-icons { display:flex; gap:4px; align-items:center; }
+  .vb-icon { width:32px; height:32px; border:0; border-radius:4px; background:transparent; display:flex; align-items:center; justify-content:center; color:#b5bac1; cursor:pointer; }
+  .vb-icon:hover { background:#3f4147; color:#dbdee1; }
+  .vb-icon.red:hover { background:var(--red); color:#fff; }
+  .vb-icon svg { width:20px; height:20px; }
+
+  ::-webkit-scrollbar { width:8px; } ::-webkit-scrollbar-track { background:transparent; } ::-webkit-scrollbar-thumb { background:#3f4147; border-radius:4px; }
 </style>
 </head>
 <body>
-<div class="wrap">
-  <h1>SCREEN<span class="dot">LIVE</span></h1>
-  <p class="sub">Mostre sua tela ao vivo para quem tiver o código da sala</p>
 
-  <div class="panel">
-    <div class="row">
-      <input id="code" placeholder="CÓDIGO DA SALA (ex: CASA123)" maxlength="12" autocomplete="off">
-      <button class="btn-transmit" onclick="startBroadcast()">Transmitir minha tela</button>
-      <button class="btn-watch" onclick="startWatching()">Assistir</button>
-    </div>
-    <div class="row" id="stopWrap" style="display:none">
-      <button class="btn-stop" onclick="stopAll()">Encerrar sessão</button>
-    </div>
-    <div id="status" class="status">Digite um código e escolha transmitir ou assistir.</div>
-    <div id="iceline" class="ice"></div>
-  </div>
+<div class="app">
 
-  <div class="videos">
-    <div class="video-card hidden" id="cardBroadcast">
-      <video id="preview" autoplay muted playsinline></video>
-      <div class="tag">SUA TELA (sua transmissão)</div>
-      <button class="full" onclick="fullscreen('preview')">&#10530;</button>
-    </div>
-    <div class="video-card hidden" id="cardView">
-      <video id="view" autoplay muted playsinline></video>
-      <div class="tag">TELA DO AMIGO</div>
-      <button class="full" onclick="fullscreen('view')">&#10530;</button>
-    </div>
-  </div>
+  <!-- Servidores -->
+  <nav class="rail">
+    <button class="icon-btn home" title="Início"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3l9 8h-3v9h-4v-6h-4v6H6v-9H3z"/></svg></button>
+    <div class="divider"></div>
+    <div class="icon-btn server" title="SCREENLIVE">SL</div>
+    <button class="icon-btn" title="Adicionar servidor"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M11 5h2v6h6v2h-6v6h-2v-6H5v-2h6z"/></svg></button>
+    <button class="icon-btn" title="Explorar servidores"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18M3 12h18"/></svg></button>
+    <div class="rail-spacer"></div>
+    <button class="icon-btn" title="Configurações do servidor"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.4 13a7.6 7.6 0 0 0 0-2l2-1.5-2-3.4-2.3 1a7.6 7.6 0 0 0-1.7-1L15 3.5h-4l-.4 2.6a7.6 7.6 0 0 0-1.7 1l-2.3-1-2 3.4 2 1.5a7.6 7.6 0 0 0 0 2l-2 1.5 2 3.4 2.3-1a7.6 7.6 0 0 0 1.7 1l.4 2.6h4l.4-2.6a7.6 7.6 0 0 0 1.7-1l2.3 1 2-3.4zM13 15.5A3.5 3.5 0 1 1 13 8a3.5 3.5 0 0 1 0 7.5z"/></svg></button>
+  </nav>
 
-  <p class="note">
-    O vídeo tenta ir direto de PC para PC (P2P). Se a rede bloquear, ele passa por uma
-    retransmissão gratuita (TURN).<br>
-    Cuidado: a tela inteira é transmitida — feche o que não quiser mostrar.
-  </p>
+  <!-- Canais -->
+  <aside class="channels">
+    <div class="server-name">SCREENLIVE <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M7 10l5 5 5-5z"/></svg></div>
+
+    <div class="chan-section">INFORMAÇÕES</div>
+    <div class="chan"><span class="hash">#</span> como-funciona</div>
+    <div class="chan"><span class="hash">#</span> dicas-antifurto</div>
+
+    <div class="chan-section">AO VIVO</div>
+    <div class="chan voice active"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a5 5 0 0 0-5 5v5a5 5 0 0 0 10 0V7a5 5 0 0 0-5-5zM4 12a8 8 0 0 0 16 0h-2a6 6 0 1 1-11.3 0H4z"/></svg> Sala Geral</div>
+    <div class="chan voice"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a5 5 0 0 0-5 5v5a5 5 0 0 0 10 0V7a5 5 0 0 0-5-5zM4 12a8 8 0 0 0 16 0h-2a6 6 0 1 1-11.3 0H4z"/></svg> Central de Games</div>
+    <div class="chan voice"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a5 5 0 0 0-5 5v5a5 5 0 0 0 10 0V7a5 5 0 0 0-5-5zM4 12a8 8 0 0 0 16 0h-2a6 6 0 1 1-11.3 0H4z"/></svg> Voar Alto</div>
+
+    <div class="channels-foot">Só quem tem o código da sala entra na transmissão.</div>
+  </aside>
+
+  <!-- Principal -->
+  <main class="main">
+    <div class="main-header">
+      <div class="chan-title"><span class="hash">#</span> transmissao-ao-vivo</div>
+      <div class="room-chip"><span class="live-dot"></span> CÓDIGO: <span id="roomcode">—</span></div>
+    </div>
+
+    <div class="stage-status" id="status">Digite um código e escolha transmitir ou assistir.</div>
+
+    <div class="stage">
+      <div class="empty">
+        <div class="mic-circle"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a5 5 0 0 0-5 5v5a5 5 0 0 0 10 0V7a5 5 0 0 0-5-5zM4 12a8 8 0 0 0 16 0h-2a6 6 0 1 1-11.3 0H4z"/></svg></div>
+        <h3>Sem transmissão por aqui</h3>
+        <p>Digite um código na barra abaixo e clique em <strong>Transmitir minha tela</strong> para começar, ou em <strong>Assistir</strong> para ver a tela de um amigo.</p>
+      </div>
+
+      <div class="video-card hidden" id="cardBroadcast">
+        <video id="preview" autoplay muted playsinline></video>
+        <div class="tag">SUA TELA · transmitindo</div>
+        <button class="full" onclick="fullscreen('preview')">Tela cheia</button>
+      </div>
+
+      <div class="video-card hidden" id="cardView">
+        <video id="view" autoplay muted playsinline></video>
+        <div class="tag">TELA DO AMIGO</div>
+        <button class="full" onclick="fullscreen('view')">Tela cheia</button>
+      </div>
+    </div>
+
+    <div class="ice" id="iceline"></div>
+
+    <div class="controls">
+      <input id="code" placeholder="Digite o código da sala (ex: CASA123)" maxlength="12" autocomplete="off">
+      <button class="discord-btn btn-transmit" onclick="startBroadcast()">Transmitir minha tela</button>
+      <button class="discord-btn btn-watch" onclick="startWatching()">Assistir</button>
+      <div id="stopWrap" style="display:none">
+        <button class="discord-btn btn-stop" onclick="stopAll()">Encerrar</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- Membros -->
+  <aside class="members">
+    <div class="members-title">ONLINE — 1</div>
+    <div class="member-row">
+      <div class="avatar"><span class="sdot"></span>V</div>
+      <span class="member-name">VOCÊ</span>
+    </div>
+    <div class="members-title" style="margin-top:18px">AO VIVO NESTA SALA</div>
+    <div class="member-row">
+      <div class="avatar" style="background:linear-gradient(135deg,#23a559,#2ecc71)">&#9679;</div>
+      <span class="member-name">Canal aberto para quem tiver o código</span>
+    </div>
+  </aside>
 </div>
+
+<!-- Barra de voz -->
+<footer class="voicebar">
+  <div class="vb-left">
+    <div class="avatar" style="background:linear-gradient(135deg,#5865f2,#9b59b6)"><span class="sdot"></span>V</div>
+    <div class="vb-info">
+      <span class="vb-name">VOCÊ</span>
+      <span class="vb-status" id="vbStatus">Ocioso</span>
+    </div>
+  </div>
+  <div style="display:flex; align-items:center; gap:10px;">
+    <button class="vb-icon" id="btnMic" title="Microfone" onclick="toggleIcon(this)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a5 5 0 0 0-5 5v5a5 5 0 0 0 10 0V7a5 5 0 0 0-5-5zM4 12a8 8 0 0 0 16 0h-2a6 6 0 1 1-11.3 0H4z"/></svg></button>
+    <button class="vb-icon" id="btnHead" title="Fones de ouvido" onclick="toggleIcon(this)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 12a9 9 0 0 1 18 0v6a3 3 0 0 1-3 3h-2v-8h2v2h1V12a7 7 0 0 0-14 0v3h1v8H6a3 3 0 0 1-3-3z"/></svg></button>
+    <button class="vb-icon red" title="Desconectar" onclick="location.reload()"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 4l4 4h-3v3l-2-2v-1H9zm4 4v2.9a4 4 0 1 1-8 0V10h2v2.9a2 2 0 1 0 4 0V10z"/></svg></button>
+    <div style="opacity:.4">|</div>
+    <button class="vb-icon" title="Configurações"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.4 13a7.6 7.6 0 0 0 0-2l2-1.5-2-3.4-2.3 1a7.6 7.6 0 0 0-1.7-1L15 3.5h-4l-.4 2.6a7.6 7.6 0 0 0-1.7 1l-2.3-1-2 3.4 2 1.5a7.6 7.6 0 0 0 0 2l-2 1.5 2 3.4 2.3-1a7.6 7.6 0 0 0 1.7 1l.4 2.6h4l.4-2.6a7.6 7.6 0 0 0 1.7-1l2.3 1 2-3.4zM13 15.5A3.5 3.5 0 1 1 13 8a3.5 3.5 0 0 1 0 7.5z"/></svg></button>
+  </div>
+</footer>
 
 <script src="https://cdn.jsdelivr.net/npm/mqtt@5.10.3/dist/mqtt.min.js"></script>
 <script>
@@ -100,7 +235,7 @@
 
   function setStatus(msg, cls) {
     const s = $("status");
-    s.className = "status " + (cls || "");
+    s.className = "stage-status " + (cls || "");
     s.innerHTML = msg;
   }
 
@@ -116,6 +251,11 @@
     const el = $(id);
     if (document.fullscreenElement) document.exitFullscreen();
     else if (el.requestFullscreen) el.requestFullscreen();
+  }
+
+  function toggleIcon(btn) {
+    if (btn.classList.contains("red")) btn.classList.remove("red");
+    else btn.classList.add("red");
   }
 
   function sendSignal(kind, data) {
@@ -161,7 +301,7 @@
     c.forEach((x) => pc.addIceCandidate(x).catch(() => {}));
   }
 
-  function fmtKB(n) { return (n / 1000).toFixed(0) + " kB/s"; }
+  function fmtKB(n) { return (n / 1000).toFixed(0) + " kB"; }
 
   let statsTimer = null;
   function startStats() {
@@ -244,6 +384,8 @@
       const s = myStream.getVideoTracks()[0].getSettings();
       const st = myStream.getVideoTracks()[0].readyState;
       setIce(`Capturando tela ${s.width}x${s.height}${s.frameRate ? " @" + Math.round(s.frameRate) + "fps" : ""} · ${st === "live" ? "ativa" : "parada"}.`, "ok");
+      const vs = $("vbStatus");
+      if (vs) vs.textContent = "Transmitindo minha tela";
     } catch (e) {}
   }
 
@@ -251,6 +393,8 @@
     role = isHost ? "host" : "guest";
     topic = "screenlive/" + roomCode.toLowerCase() + "/json";
     myId = "sl" + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+    const rc = $("roomcode");
+    if (rc) rc.textContent = roomCode;
 
     mq = mqtt.connect("wss://broker.emqx.io:8084/mqtt", {
       clientId: myId,
@@ -340,6 +484,10 @@
     if (mq) { try { mq.end(true); } catch (e) {} mq = null; }
     gotAnswer = false; gotOffer = false;
     pendingCands = [];
+    const rc = $("roomcode");
+    if (rc) rc.textContent = "—";
+    const vs = $("vbStatus");
+    if (vs) vs.textContent = "Ocioso";
     $("code").value = "";
     $("cardBroadcast").classList.add("hidden");
     $("cardView").classList.add("hidden");
