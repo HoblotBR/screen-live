@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Screen Live — Compartilhe sua tela</title>
+<style>
+  :root { --bg:#0b0f14; --card:#141a22; --border:#242e3b; --text:#e8eef5; --muted:#8aa0b8; --accent:#22d3ee; --green:#34d399; --red:#f87171; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:radial-gradient(1200px 600px at 50% -100px,#122336 0%,var(--bg) 60%); color:var(--text); font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif; min-height:100vh; padding:32px 16px; }
+  .wrap { max-width:920px; margin:0 auto; }
+  h1 { text-align:center; font-size:34px; letter-spacing:2px; }
+  h1 .dot { color:var(--red); }
+  p.sub { text-align:center; color:var(--muted); margin:8px 0 24px; font-size:14px; }
+  .panel { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:18px; }
+  .row { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:8px; }
+  input { flex:1; min-width:220px; background:#0d131b; border:1px solid var(--border); color:var(--text); padding:13px 14px; border-radius:10px; font-size:16px; letter-spacing:2px; text-transform:uppercase; }
+  input:focus { outline:2px solid var(--accent); border-color:transparent; }
+  button { border:0; border-radius:10px; padding:13px 18px; font-size:15px; font-weight:700; cursor:pointer; color:#03121a; }
+  .btn-transmit { background:var(--green); flex:1; }
+  .btn-watch { background:var(--accent); flex:1; }
+  .btn-stop { background:var(--red); color:#fff; }
+  .status { margin:12px 0 0; color:var(--muted); min-height:22px; font-size:14px; line-height:1.5; }
+  .status.ok { color:var(--green); }
+  .status.bad { color:var(--red); }
+  .code { color:var(--accent); font-weight:700; letter-spacing:2px; }
+  .videos { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  @media (max-width:700px){ .videos { grid-template-columns:1fr; } }
+  .video-card { background:#000; border:1px solid var(--border); border-radius:12px; overflow:hidden; position:relative; }
+  .video-card.hidden { display:none; }
+  video { width:100%; aspect-ratio:16/9; display:block; background:#000; object-fit:contain; }
+  .tag { position:absolute; top:10px; left:10px; background:rgba(0,0,0,.6); color:var(--muted); font-size:12px; padding:4px 10px; border-radius:6px; letter-spacing:1px; }
+  .full { position:absolute; top:10px; right:10px; background:rgba(0,0,0,.6); color:var(--text); border:0; border-radius:6px; padding:5px 12px; cursor:pointer; font-size:12px; }
+  .note { margin-top:18px; color:var(--muted); font-size:12px; line-height:1.7; text-align:center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>SCREEN<span class="dot">LIVE</span></h1>
+  <p class="sub">Mostre sua tela ao vivo para quem tiver o código da sala</p>
+
+  <div class="panel">
+    <div class="row">
+      <input id="code" placeholder="CÓDIGO DA SALA (ex: CASA123)" maxlength="12" autocomplete="off">
+      <button class="btn-transmit" onclick="startBroadcast()">Transmitir minha tela</button>
+      <button class="btn-watch" onclick="startWatching()">Assistir</button>
+    </div>
+    <div class="row" id="stopWrap" style="display:none">
+      <button class="btn-stop" onclick="stopAll()">Encerrar sessão</button>
+    </div>
+    <div id="status" class="status">Digite um código e escolha transmitir ou assistir.</div>
+  </div>
+
+  <div class="videos">
+    <div class="video-card hidden" id="cardBroadcast">
+      <video id="preview" muted playsinline></video>
+      <div class="tag">SUA TELA (minha transmissão)</div>
+      <button class="full" onclick="fullscreen('preview')">⛶</button>
+    </div>
+    <div class="video-card hidden" id="cardView">
+      <video id="view" muted playsinline></video>
+      <div class="tag">TELA DO AMIGO</div>
+      <button class="full" onclick="fullscreen('view')">⛶</button>
+    </div>
+  </div>
+
+  <p class="note">
+    O vídeo vai direto de PC para PC (não passa por servidor).<br>
+    Cuidado: a tela inteira é transmitida — feche o que não quiser mostrar.
+  </p>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.5/dist/peerjs.min.js"></script>
+<script>
+  const $ = (id) => document.getElementById(id);
+  let peer = null;
+  let myStream = null;
+
+  function cleanCode(raw) {
+    return (raw || "").toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 12);
+  }
+
+  function setStatus(msg, cls) {
+    const s = $("status");
+    s.className = "status " + (cls || "");
+    s.innerHTML = msg;
+  }
+
+  function refreshStop() {
+    $("stopWrap").style.display = (peer || myStream) ? "flex" : "none";
+  }
+
+  function fullscreen(id) {
+    const el = $(id);
+    if (document.fullscreenElement) document.exitFullscreen();
+    else if (el.requestFullscreen) el.requestFullscreen();
+  }
+
+  async function startBroadcast() {
+    const code = cleanCode($("code").value);
+    if (code.length < 4) {
+      setStatus("Digite um código de sala com pelo menos 4 letras ou números.", "bad");
+      return;
+    }
+    $("code").value = "";
+    try {
+      myStream = await navigator.mediaDevices.getDisplayMedia({ video: { frameRate: { ideal: 30 } }, audio: false });
+    } catch (e) {
+      setStatus("Captura de tela não permitida. Clique em \"Compartilhar\" e selecione a tela.", "bad");
+      return;
+    }
+    myStream.getVideoTracks()[0].addEventListener("ended", () => { setStatus("Transmissão encerrada (você parou o compartilhamento).", "bad"); maybeStop(); });
+
+    const pv = $("preview");
+    pv.srcObject = myStream;
+    $("cardBroadcast").classList.remove("hidden");
+    await pv.play();
+
+    peer = new Peer("tela-" + code, { debug: 1 });
+    peer.on("open", () => {
+      setStatus(`Sala <span class="code">${code}</span> criada. Mande só esse código para seu amigo.`);
+      refreshStop();
+    });
+    peer.on("call", (call) => {
+      call.answer(myStream);
+      setStatus("Alguém conectou! Transmitindo ao vivo.", "ok");
+    });
+    peer.on("error", (err) => {
+      if (err.type === "unavailable-id") setStatus(`O código <span class="code">${code}</span> já está sendo usado por alguém.`, "bad");
+      else setStatus("Erro: " + err.message, "bad");
+    });
+    refreshStop();
+  }
+
+  function startWatching() {
+    const code = cleanCode($("code").value);
+    if (code.length < 4) {
+      setStatus("Digite o código da sala que você quer assistir.", "bad");
+      return;
+    }
+    $("code").value = "";
+    peer = new Peer({ debug: 1 });
+    peer.on("open", () => {
+      setStatus(`Procurando a sala <span class="code">${code}</span>...`);
+      let attempts = 0;
+      const tryCall = () => {
+        if (attempts++ > 30) {
+          setStatus("Sala não encontrada. Confira o código ou o amigo não está transmitindo.", "bad");
+          maybeStop();
+          return;
+        }
+        const call = peer.call("tela-" + code);
+        call.on("stream", (remote) => {
+          const v = $("view");
+          v.srcObject = remote;
+          $("cardView").classList.remove("hidden");
+          v.play();
+          setStatus("Conectado! Assistindo ao vivo.", "ok");
+          refreshStop();
+        });
+        call.on("close", () => {
+          setStatus("O transmissor encerrou a sessão.", "bad");
+          maybeStop();
+        });
+        call.on("error", (err) => {
+          if (err.type === "peer-unavailable" || err.type === "negotiation-failed") setTimeout(tryCall, 1000);
+          else { setStatus("Erro: " + err.message, "bad"); maybeStop(); }
+        });
+      };
+      tryCall();
+    });
+    peer.on("error", (err) => {
+      setStatus("Erro: " + err.message, "bad");
+      maybeStop();
+    });
+    refreshStop();
+  }
+
+  function maybeStop() {
+    if (!myStream) stopAll();
+  }
+
+  function stopAll() {
+    if (peer) { peer.destroy(); peer = null; }
+    if (myStream) { myStream.getTracks().forEach((t) => t.stop()); myStream = null; }
+    $("code").value = "";
+    $("cardBroadcast").classList.add("hidden");
+    $("cardView").classList.add("hidden");
+    $("preview").srcObject = null;
+    $("view").srcObject = null;
+    setStatus("Sessão encerrada.");
+    refreshStop();
+  }
+
+  window.addEventListener("beforeunload", () => {
+    if (peer) peer.destroy();
+    if (myStream) myStream.getTracks().forEach((t) => t.stop());
+  });
+</script>
+</body>
+</html>
