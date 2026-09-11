@@ -241,7 +241,7 @@
     <div id="modalInputWrap"><input id="modalInput" inputmode="numeric" maxlength="4" placeholder="0000"></div>
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
-      <button class="btn btn-primary" onclick="modalConfirm()">Confirmar</button>
+      <button class="btn btn-primary" id="modalConfirm" onclick="modalConfirm()">Confirmar</button>
     </div>
   </div>
 </div>
@@ -357,7 +357,7 @@
           <div class="call-controls">
             <div class="ctl-bar">
               <button class="ctl" id="btnMic" onclick="toggleMic()" title="Microfone"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a5 5 0 0 0-5 5v5a5 5 0 0 0 10 0V7a5 5 0 0 0-5-5zM4 12a8 8 0 0 0 16 0h-2a6 6 0 1 1-11.3 0H4z"/></svg></button>
-              <button class="ctl" onclick="toggleCam()" title="Câmera"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M17 10.5V7a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-3.5l4 4v-11z"/></svg></button>
+              <button class="ctl" id="btnCam" onclick="toggleCam()" title="Câmera"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M17 10.5V7a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-3.5l4 4v-11z"/></svg></button>
               <button class="ctl ctl-share" id="btnShare" onclick="shareScreen()" title="Compartilhar tela"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm-1 14.5v-4H8l4-4 4 4h-3v4z"/></svg></button>
               <div class="ctl-sep"></div>
               <button class="ctl" onclick="toast('Atividades em breve.')" title="Atividades"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zM8.5 8.5l7 7-2 2-7-7zm-2.8 0 2 2-3 1.5zm8 6.5 2-2 3-1.5zm-2.7-10.5 2 2-1.5 3z"/></svg></button>
