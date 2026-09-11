@@ -253,6 +253,22 @@
   .btn{ border:0; border-radius:12px; font-weight:600; font-size:14px; padding:11px 16px; cursor:pointer; flex:1; font-family:inherit; transition:background .15s; }
   .btn-primary{ background:var(--brand); color:#fff; } .btn-primary:hover{ background:var(--brand2); }
   .btn-ghost{ background:var(--card); color:var(--t2); border:1px solid var(--line2); } .btn-ghost:hover{ background:var(--hover); }
+
+  /* ===== Medidor de voz (5 barras) ===== */
+  .vox{ display:flex; align-items:center; gap:3px; height:26px; padding:0 8px; }
+  .vox.off{ opacity:.4; }
+  .vox .vb{ width:4px; height:5px; border-radius:2px; background:rgba(255,255,255,.1); transition:height .12s ease, background .12s; }
+  .vox .vb.on{ background:var(--green); box-shadow:0 0 6px rgba(34,197,94,.55); }
+
+  .plus.green{ background:rgba(34,197,94,.15); color:#4ade80; }
+  .plus.green:hover{ background:rgba(34,197,94,.28); color:#4ade80; }
+
+  .modal-card input.channel-name{ font-size:16px; letter-spacing:0; text-align:left; padding:12px 14px; }
+  .room-note{ font-size:10px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:var(--t5); padding:6px 8px 2px; line-height:1.5; }
+  .chan .delc{ margin-left:auto; width:20px; height:20px; flex:none; border:0; border-radius:6px; background:transparent; color:var(--t5); display:none; align-items:center; justify-content:center; cursor:pointer; }
+  .chan:hover .delc{ display:flex; }
+  .chan .delc:hover{ color:var(--red); background:rgba(244,63,67,.12); }
+  .chan .delc .m{ font-size:14px; }
 </style>
 </head>
 <body>
@@ -287,10 +303,8 @@
   <nav class="rail">
     <button class="guild active" onclick="location.reload()" title="Screen Live"><span class="m">chat_bubble</span></button>
     <div class="rail-div"></div>
-    <button class="guild" onclick="location.reload()" title="Início"><span class="m">terminal</span></button>
-    <button class="guild" onclick="openHowTo()" title="Como funciona"><span class="m">help</span></button>
+    <button class="guild green" onclick="openNewChannel()" title="Criar sala ao vivo"><span class="m">add</span></button>
     <div class="rail-spacer"></div>
-    <button class="guild green" onclick="enterCall()" title="Entrar na call"><span class="m">add</span></button>
     <button class="guild red" onclick="localStorage.removeItem('screlive_name');location.reload();" title="Sair da conta"><span class="m">logout</span></button>
   </nav>
 
@@ -298,7 +312,7 @@
     <div class="server-head"><h1>SCREEN LIVE</h1><span class="m">expand_more</span></div>
     <div class="channels">
       <div class="cat-row"><span>Canais de texto</span><span class="m">add</span></div>
-      <button class="chan" id="chanComo" onclick="openHowTo()"><span class="m">campaign</span><span class="chan-name">como-funciona</span></button>
+      <button class="chan" id="chanComo" onclick="showHowTo()"><span class="m">campaign</span><span class="chan-name">como-funciona</span></button>
       <button class="chan chan-active" id="chanChat" onclick="selectText()"><span class="m">tag</span><span class="chan-name">bate-papo</span></button>
       <div class="cat-row"><span>Canais de voz</span><span class="m">add</span></div>
       <button class="chan voice" id="chanVoice" onclick="enterCall()">
@@ -306,6 +320,8 @@
         <span class="m lockc">lock</span>
         <span class="badge-online" id="voiceUsers"><i class="bdot"></i><span id="voiceUsersN">0</span></span>
       </button>
+      <div id="userChans"></div>
+      <div class="room-note">Máx. de 10 pessoas por sala. Use o <b style="color:var(--green)">+ verde</b> para criar a sua própria sala.</div>
     </div>
     <div class="user-footer">
       <div class="uf-card">
@@ -327,10 +343,10 @@
 
     <section class="view on" id="textView">
       <div class="chan-head">
-        <span class="m htag">tag</span>
-        <span class="chan-title">bate-papo</span>
+        <span class="m htag" id="htag">tag</span>
+        <span class="chan-title" id="chanTitle">bate-papo</span>
         <div class="vline"></div>
-        <p class="topic">Central de comunicação — entre na call e compartilhe sua tela.</p>
+        <p class="topic" id="chanTopic">Central de comunicação — entre na call e compartilhe sua tela.</p>
         <div class="spacer"></div>
         <div class="room-chip" id="roomChip"><i class="ld" id="roomLd"></i><span id="roomTxt">Sala: —</span></div>
         <button class="phone-btn" onclick="enterCall()"><span class="m">call</span><span id="phoneTxt">Entrar na call</span></button>
@@ -338,7 +354,7 @@
       <div class="msgs" id="textMsgs"></div>
       <div class="msg-bar">
         <div class="msg-field">
-          <button class="plus" onclick="openEmoji('textInput', this)" title="Adicionar emoji"><span class="m">add</span></button>
+          <button class="plus green" onclick="openNewChannel()" title="Criar sala ao vivo — nomeie e entre"><span class="m">add</span></button>
           <input id="textInput" placeholder="Mensagem para #bate-papo..." autocomplete="off">
           <div class="ib-right">
             <button class="ib-btn" onclick="openEmoji('textInput', this)" title="Emoji"><span class="m">sentiment_satisfied</span></button>
@@ -371,7 +387,7 @@
             </div>
 
             <div class="tile" id="tileView">
-              <video id="view" autoplay muted playsinline></video>
+              <video id="view" autoplay playsinline></video>
               <span class="tile-name" id="viewName" style="color:#fff">Tela do amigo</span>
             </div>
 
@@ -386,6 +402,9 @@
 
           <div class="call-controls">
             <div class="ctl-bar">
+              <div class="vox off" id="vox">
+                <div class="vb"></div><div class="vb"></div><div class="vb"></div><div class="vb"></div><div class="vb"></div>
+              </div>
               <button class="ctl" id="btnMic" onclick="toggleMic()" title="Microfone"><span class="m">mic</span></button>
               <button class="ctl" id="btnCam" onclick="toggleCam()" title="Câmera"><span class="m">videocam</span></button>
               <button class="ctl ctl-share" id="btnShare" onclick="shareScreen()" title="Compartilhar tela"><span class="m">screen_share</span></button>
@@ -441,12 +460,86 @@
   var messages = [];
   var statsTimer = null, prevBytes = 0, prevTime = 0, curBps = 0;
 
+  var MAX_PER_ROOM = 10;
+  var micStream = null, audioCtx = null, analyser = null, audioTrans = null, micRaf = null, fullTimer = null;
+  var fd = null, rfd = null, remoteCtx = null, remoteAnalyser = null;
+  var speakOn = false, remoteSpeak = false;
+  var chanMode = "chat";
+  var modalKind = null;
+
   var EMOJIS = ["😀","😂","🤣","😍","😎","😮","😅","🥳","😢","😡","👍","👎","👏","🙏","🔥","❤️","💯","🎉","🎮","🚀","⚡","👾","✅","🍿","📺"];
 
   function cleanCode(raw) { return (raw || "").toUpperCase().replace(/[^0-9]/g, "").slice(0, 4); }
   function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
   function fmtTs(ts) { try { return new Date(ts).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }); } catch (e) { return ""; } }
   function toast(m) { var t = $("toast"); t.textContent = m; t.classList.add("show"); clearTimeout(t._t); t._t = setTimeout(function () { t.classList.remove("show"); }, 2200); }
+
+  /* ===== Suas salas (criar canal) ===== */
+  var BAD_WORDS = ["caralho","porra","foder","fodeu","foda-se","merda","bosta","puta","puto","piranha","vadia","vagabunda","vagabundo","corno","cuzão","cuzinho","rola","piroca","buceta","xota","xoxota","xereca","punheta","babaca","imbecil","idiota","burro","burra","escroto","escrota","nojento","nojenta","desgraça","desgraca","maldito","maldita","arromba","arrombado","pau","fdp","vsf","otário","otaria","cachorra","safado","safada","tarado","tarada","bicha","viado","veado","traveco","sapatão","nazista","fascista","chifrudo","chifrada","putinha","rabuda","cadelinha"];
+  function badWord(s) {
+    var t = s.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9\s]/g, " ");
+    for (var i = 0; i < BAD_WORDS.length; i++) {
+      if ((new RegExp("(^|[^a-z0-9])" + BAD_WORDS[i] + "([^a-z0-9]|$)")).test(t)) return true;
+    }
+    return false;
+  }
+  function loadChannels() {
+    try { var v = JSON.parse(localStorage.getItem("screlive_channels") || "[]"); return Array.isArray(v) ? v : []; } catch (e) { return []; }
+  }
+  var myChannels = loadChannels();
+  function saveChannels() { try { localStorage.setItem("screlive_channels", JSON.stringify(myChannels)); } catch (e) {} }
+  function renderUserChans() {
+    var box = $("userChans");
+    if (!box) return;
+    box.innerHTML = "";
+    if (!myChannels.length) return;
+    var title = document.createElement("div");
+    title.className = "room-note";
+    title.textContent = "SUAS SALAS";
+    box.appendChild(title);
+    myChannels.forEach(function (ch, idx) {
+      var row = document.createElement("div");
+      row.className = "chan voice" + (state.inCall && roomPassword === ch.code ? " chan-active" : "");
+      row.setAttribute("role", "button");
+      row.innerHTML = '<span class="m">volume_up</span><span class="chan-name"></span>' +
+        '<button class="delc" title="Excluir sala"><span class="m">close</span></button>';
+      row.querySelector(".chan-name").textContent = ch.name;
+      row.addEventListener("click", function (e) {
+        if (e.target.closest && e.target.closest(".delc")) return;
+        if (state.inCall && roomPassword === ch.code) { toast("Você já está nesta sala."); return; }
+        joinRoom(ch.code);
+      });
+      var del = row.querySelector(".delc");
+      del.addEventListener("click", function (ev) {
+        ev.stopPropagation();
+        if (!window.confirm("Excluir a sala \"" + ch.name + "\"?")) return;
+        myChannels.splice(idx, 1);
+        saveChannels();
+        renderUserChans();
+      });
+      box.appendChild(row);
+    });
+  }
+  function askChannelName() {
+    return new Promise(function (res) {
+      modalResolver = res;
+      openModal("channel", "Criar sala ao vivo",
+        "Escolha um <b>nome</b> para a sua sala (sem palavrões). Depois defina a <b>senha de 4 dígitos</b>.<br>Até <b>10 pessoas</b> por sala.");
+    });
+  }
+  async function openNewChannel() {
+    if (!profileName) { $("loginName").focus(); toast("Coloque seu nome primeiro."); return; }
+    if (state.inCall) leaveCall();
+    var name = await askChannelName();
+    if (!name) return;
+    var pwd = await askPassword();
+    if (!pwd) return;
+    myChannels.unshift({ id: "slc" + Date.now().toString(36), name: name, code: pwd });
+    saveChannels();
+    renderUserChans();
+    toast("Sala \"" + name + "\" criada!");
+    joinRoom(pwd);
+  }
 
   /* ===== Entrada ===== */
   function doLogin() {
@@ -462,17 +555,117 @@
   }
   function setFootSub(t) { $("footSub").textContent = t; }
 
-  function toggleMic() {
-    state.muted = !state.muted;
+  async function toggleMic() {
+    if (state.muted) {
+      var ok = await enableMic();
+      if (!ok) return;
+      state.muted = false;
+    } else {
+      state.muted = true;
+    }
+    updateMicUi();
+  }
+  function updateMicUi() {
     $("footMic").classList.toggle("red", state.muted);
     $("btnMic").classList.toggle("on-red", state.muted);
-    $("footSub").textContent = state.muted ? "Silenciado" : (state.inCall ? "Em uma call" : "Ocioso");
+    $("btnMic").classList.toggle("on-green", !state.muted);
+    setFootSub(state.muted ? "Silenciado" : (state.inCall ? "Microfone ativo" : "Ocioso"));
+    var voxEl = $("vox"); if (voxEl) voxEl.classList.toggle("off", state.muted || !micStream);
+    setVox(0);
+    if (!state.muted && micStream) startVox(); else stopVox();
+    syncMicToPc(state.muted ? null : (micStream ? micStream.getAudioTracks()[0] : null));
+  }
+  async function enableMic() {
+    if (micStream) return true;
+    try {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) throw new Error("no api");
+      micStream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }, video: false });
+      return true;
+    } catch (e) { toast("Não foi possível usar o microfone. Permita o acesso no navegador."); return false; }
+  }
+  function syncMicToPc(track) {
+    if (!audioTrans) return;
+    var sender = audioTrans.sender;
+    if (sender && sender.replaceTrack) sender.replaceTrack(track).catch(function () {});
+  }
+  function startVox() {
+    if (!micStream) return;
+    if (!audioCtx) {
+      try {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === "suspended") audioCtx.resume();
+        var src = audioCtx.createMediaStreamSource(micStream);
+        analyser = audioCtx.createAnalyser();
+        analyser.fftSize = 256; analyser.smoothingTimeConstant = 0.75;
+        src.connect(analyser);
+      } catch (e) { return; }
+    }
+    if (!micRaf) voxTick();
+  }
+  function stopVox() { if (micRaf) { cancelAnimationFrame(micRaf); micRaf = null; } setVox(0); }
+  function voxTick() {
+    micRaf = requestAnimationFrame(voxTick);
+    var lvl = 0, rlvl = 0;
+    if (analyser && !state.muted) {
+      if (!fd || fd.length !== analyser.frequencyBinCount) fd = new Uint8Array(analyser.frequencyBinCount);
+      analyser.getByteFrequencyData(fd);
+      var sum = 0, n = Math.floor(fd.length * 0.35);
+      for (var i = 1; i < Math.max(n, 2); i++) sum += fd[i];
+      lvl = sum / (Math.max(n, 2) * 255);
+      setVox(lvl);
+      speakOn = lvl > 0.13;
+    } else { setVox(0); speakOn = false; }
+    if (remoteAnalyser) {
+      if (!rfd || rfd.length !== remoteAnalyser.frequencyBinCount) rfd = new Uint8Array(remoteAnalyser.frequencyBinCount);
+      remoteAnalyser.getByteFrequencyData(rfd);
+      var s2 = 0, m2 = Math.floor(rfd.length * 0.35);
+      for (var j = 1; j < Math.max(m2, 2); j++) s2 += rfd[j];
+      rlvl = s2 / (Math.max(m2, 2) * 255);
+      remoteSpeak = rlvl > 0.13;
+    } else remoteSpeak = false;
+    applySpeak();
+  }
+  function setVox(lvl) {
+    var el = $("vox"); if (!el) return;
+    var bars = el.children, len = bars.length;
+    var open = Math.max(0, Math.min(len, Math.round(lvl * len)));
+    for (var k = 0; k < len; k++) {
+      var on = k < open;
+      bars[k].classList.toggle("on", on);
+      bars[k].style.height = on ? Math.max(5, 6 + Math.round(lvl * 20)) + "px" : "5px";
+    }
+  }
+  function applySpeak() {
+    var t1 = $("tileBroad"), t2 = $("tileView");
+    if (t1) t1.classList.toggle("speak", speakOn && t1.classList.contains("show"));
+    if (t2) t2.classList.toggle("speak", remoteSpeak && t2.classList.contains("show"));
+  }
+  function listenRemote(stream) {
+    if (!stream || !stream.getAudioTracks().length) return;
+    try {
+      remoteCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (remoteCtx.state === "suspended") remoteCtx.resume();
+      var src = remoteCtx.createMediaStreamSource(stream);
+      remoteAnalyser = remoteCtx.createAnalyser();
+      remoteAnalyser.fftSize = 256;
+      src.connect(remoteAnalyser);
+    } catch (e) {}
+  }
+  function stopRemoteAudio() {
+    if (remoteCtx) { try { remoteCtx.close(); } catch (e) {} remoteCtx = null; remoteAnalyser = null; }
   }
   function toggleDeaf() {
-    state.deaf = !state.deaf;
-    $("footDeaf").classList.toggle("red", state.deaf);
-    if (state.deaf) { if (!state.muted) toggleMic(); $("footSub").textContent = "Suspenso"; }
-    else { if (state.muted) toggleMic(); setFootSub(state.inCall ? "Em uma call" : "Ocioso"); }
+    if (state.deaf) {
+      state.deaf = false;
+      $("footDeaf").classList.remove("red");
+      if (state.muted) toggleMic();
+      setFootSub(state.inCall ? "Em uma call" : "Ocioso");
+    } else {
+      state.deaf = true;
+      $("footDeaf").classList.add("red");
+      if (!state.muted) toggleMic();
+      setFootSub("Suspenso");
+    }
   }
   function toggleCam() {
     state.camOn = !state.camOn;
@@ -482,34 +675,52 @@
 
   /* ===== Modal ===== */
   function openModal(kind, title, body) {
+    modalKind = kind;
     $("modalTitle").textContent = title;
     $("modalBody").innerHTML = body;
     $("modalInput").value = "";
-    $("modalInputWrap").style.display = (kind === "password") ? "" : "none";
-    $("modalConfirm").textContent = (kind === "password") ? "Entrar" : "OK";
+    $("modalInputWrap").style.display = (kind === "password" || kind === "channel") ? "" : "none";
+    $("modalConfirm").textContent = kind === "password" ? "Entrar" : "Criar";
+    var num = kind === "password";
+    $("modalInput").setAttribute("inputmode", num ? "numeric" : "text");
+    $("modalInput").setAttribute("maxlength", num ? "4" : "24");
+    $("modalInput").placeholder = num ? "0000" : "Nome da sua sala";
+    $("modalInput").classList.toggle("channel-name", !num);
     $("modal").style.display = "flex";
-    if (kind === "password") setTimeout(function () { $("modalInput").focus(); }, 60);
+    if (kind !== "info") setTimeout(function () { $("modalInput").focus(); }, 60);
   }
   function askPassword() {
     return new Promise(function (res) {
       modalResolver = res;
       openModal("password", "Entrar na call",
-        "Digite a <b>senha de 4 dígitos</b> da sala ao vivo. Quem transmitir e quem assistir usam a <b>mesma senha</b>.");
+        "Digite a <b>senha de 4 dígitos</b> da sala ao vivo. Quem transmite e quem assiste usam a <b>mesma senha</b>.");
     });
   }
   function modalConfirm() {
-    var isPw = $("modalInputWrap").style.display === "";
+    if (modalKind === "channel") {
+      var name = $("modalInput").value.trim();
+      if (name.length < 2 || name.length > 24) { $("modalBody").innerHTML = "O nome da sala deve ter <b>2 a 24 caracteres</b>."; return; }
+      if (badWord(name)) { $("modalBody").innerHTML = "Nome <b>impróprio</b>. Escolha um nome sem palavrões."; return; }
+      $("modal").style.display = "none";
+      modalKind = null;
+      if (modalResolver) { var r = modalResolver; modalResolver = null; r(name); }
+      return;
+    }
+    var isPw = modalKind === "password";
     if (isPw) {
       var v = cleanCode($("modalInput").value);
       if (v.length !== 4) { $("modalBody").innerHTML = "A senha deve ter <b>exatamente 4 números</b>."; return; }
       $("modal").style.display = "none";
+      modalKind = null;
       if (modalResolver) { var r = modalResolver; modalResolver = null; r(v); }
     } else {
       $("modal").style.display = "none";
+      modalKind = null;
     }
   }
   function closeModal() {
     $("modal").style.display = "none";
+    modalKind = null;
     if (modalResolver) { var r = modalResolver; modalResolver = null; r(null); }
   }
   function openHowTo() {
@@ -570,6 +781,25 @@
   function renderMsgs() {
     var tw = $("textMsgs"), cw = $("callMsgs");
     tw.innerHTML = ""; cw.innerHTML = "";
+    if (chanMode === "howto") {
+      var hEl = document.createElement("div");
+      hEl.className = "msg-empty";
+      hEl.style.textAlign = "left";
+      hEl.innerHTML = '<div style="max-width:560px;margin:auto;line-height:1.95">' +
+        '<div style="width:56px;height:56px;border-radius:20px;background:var(--brand);display:flex;align-items:center;justify-content:center;margin-bottom:14px;box-shadow:0 0 26px -6px rgba(88,101,242,.55)"><span class="m" style="font-size:30px;color:#fff">campaign</span></div>' +
+        '<h2 style="font-family:\'Plus Jakarta Sans\';font-weight:700;font-size:22px;color:#fff;margin-bottom:8px">Como funciona</h2>' +
+        '<ol style="padding-left:20px;color:var(--t3)">' +
+        '<li>Clique em <b>Sala ao vivo</b> e digite a <b>senha de 4 dígitos</b> que você escolher.</li>' +
+        '<li>A call abre na hora. Clique em <b>Compartilhar tela</b> para transmitir o jogo a 60 FPS.</li>' +
+        '<li>Ou use o botão <b style="color:var(--green)">+ verde</b> para criar a sua própria sala com nome (sem palavrões).</li>' +
+        '<li>Envie a <b>mesma senha</b> para seus amigos. Cada sala aceita até <b>10 pessoas</b>.</li>' +
+        '<li>Para falar, ative o <b>microfone</b>: as 5 barras verdes e a borda do vídeo reagem à sua voz.</li>' +
+        '<li>Para sair, use o <b>botão vermelho</b> na barra de controles da call.</li>' +
+        '</ol></div>';
+      tw.appendChild(hEl);
+      cw.innerHTML = '';
+      return;
+    }
     var welcome = '<div class="welcome"><div class="wicon"><span class="m">tag</span></div><h1>Bem-vindo ao #bate-papo</h1><p>O canal geral do SCREEN LIVE — sua central de transmissão, jogos e conversa. Entre na call para compartilhar a tela.</p></div><div class="day-sep"><span>Hoje</span></div>';
     if (!messages.length) {
       tw.innerHTML = welcome + '<div class="msg-empty">Ainda não há mensagens nesta sala.<br>Digite algo abaixo ou <b>entre na call</b> para compartilhar sua tela.</div>';
@@ -610,8 +840,8 @@
   }
   function renderMembers() {
     var n = members.size;
-    $("voiceUsersN").textContent = n;
-    $("partCount").textContent = n + (n === 1 ? " participante" : " participantes");
+    $("voiceUsersN").textContent = n + "/" + MAX_PER_ROOM;
+    $("partCount").textContent = n + "/" + MAX_PER_ROOM + " na sala";
     var aw = $("awaitAvatars");
     aw.innerHTML = "";
     aw.classList.toggle("empty", n === 0);
@@ -653,6 +883,7 @@
     else setFootSub("Ocioso");
     refreshRoomChip();
     renderMembers();
+    renderUserChans();
   }
   function setChatOpen(open) {
     state.chatOpen = open;
@@ -661,8 +892,22 @@
   }
   function toggleChat() { setChatOpen(!state.chatOpen); }
   function selectText() {
-    if (!state.inCall) return;
-    leaveCall({ silent: true });
+    if (state.inCall) leaveCall({ silent: true });
+    showTextChan("chat");
+  }
+  function showHowTo() {
+    if (state.inCall) leaveCall({ silent: true });
+    showTextChan("howto");
+  }
+  function showTextChan(mode) {
+    chanMode = mode;
+    var isHow = mode === "howto";
+    $("chanComo").classList.toggle("chan-active", isHow);
+    $("chanChat").classList.toggle("chan-active", !isHow);
+    $("htag").textContent = isHow ? "campaign" : "tag";
+    $("chanTitle").textContent = isHow ? "como-funciona" : "bate-papo";
+    $("chanTopic").textContent = isHow ? "Passo a passo para usar o Screen Live." : "Central de comunicação — entre na call e compartilhe sua tela.";
+    renderMsgs();
   }
   function refreshRoomChip() {
     if (!roomPassword) {
@@ -682,12 +927,28 @@
     if (state.inCall) { toast("Você já está em uma call."); return; }
     var p = await askPassword();
     if (!p) return;
-    roomPassword = p;
+    joinRoom(p);
+  }
+  function joinRoom(code) {
+    if (!profileName) { $("loginName").focus(); toast("Coloque seu nome primeiro."); return; }
+    if (state.inCall) { toast("Você já está em uma call."); return; }
+    roomPassword = code;
     refreshRoomChip();
-    connectRoom(p);
+    connectRoom(code);
     setInCall(true);
+    scheduleFullCheck();
+  }
+  function scheduleFullCheck() {
+    if (fullTimer) clearTimeout(fullTimer);
+    fullTimer = setTimeout(function () {
+      if (state.inCall && mq && mq.connected && members.size >= MAX_PER_ROOM) {
+        toast("Esta sala está cheia (máx " + MAX_PER_ROOM + " pessoas). Você foi removido.");
+        leaveCall();
+      }
+    }, 4500);
   }
   function leaveCall(opts) {
+    if (fullTimer) { clearTimeout(fullTimer); fullTimer = null; }
     if (opts && opts.silent) { /* keep room, just exit view */ }
     else {
       closeEmoji();
@@ -806,11 +1067,17 @@
     pc = new RTCPeerConnection(ICE);
     pc.onicecandidate = function (e) { if (e.candidate) sendSignal("cand", e.candidate); };
     pc.ontrack = function (e) {
+      if (e.track.kind === "audio") {
+        try { $("view").muted = false; } catch (err) {}
+        if (e.streams && e.streams[0]) listenRemote(e.streams[0]);
+        return;
+      }
       var v = $("view");
-      v.srcObject = e.streams[0];
+      try { v.srcObject = e.streams[0]; } catch (err) {}
       $("tileView").classList.add("show");
-      $("tileView").classList.add("speak");
       updateStage();
+      try { $("view").muted = false; } catch (err) {}
+      if (e.streams && e.streams[0]) listenRemote(e.streams[0]);
       v.play().catch(function () {});
       v.addEventListener("playing", function () { setStatus("Recebendo transmissão do seu amigo.", "ok"); });
     };
@@ -834,8 +1101,11 @@
   }
   function tearDownPc() {
     stopStats();
+    stopVox();
+    stopRemoteAudio();
     if (heartbeat) { clearInterval(heartbeat); heartbeat = null; }
     if (pc) { try { pc.close(); } catch (e) {} pc = null; }
+    audioTrans = null;
     gotAnswer = false; gotOffer = false;
     pendingCands = [];
   }
@@ -844,7 +1114,9 @@
     tearDownPc();
     setupPc();
     try { pc.addTransceiver("video", { direction: "recvonly" }); } catch (e) {}
+    try { audioTrans = pc.addTransceiver("audio", { direction: "sendrecv" }); } catch (e) {}
     setCodecPrefs();
+    if (!state.muted && micStream) { syncMicToPc(micStream.getAudioTracks()[0]); startVox(); }
     startGuestHeartbeat();
     updateStage();
   }
@@ -864,7 +1136,7 @@
     if (state.screenSharing) { stopShare(); return; }
     var stream;
     try {
-      stream = await navigator.mediaDevices.getDisplayMedia({ video: { frameRate: { ideal: 30 } }, audio: false });
+      stream = await navigator.mediaDevices.getDisplayMedia({ video: { frameRate: { ideal: 60 } }, audio: true });
     } catch (e) {
       setStatus("Captura de tela não permitida. Clique em \"Compartilhar\" e selecione a tela.", "bad");
       return;
@@ -874,7 +1146,6 @@
     var pv = $("preview");
     pv.srcObject = stream;
     $("tileBroad").classList.add("show");
-    $("tileBroad").classList.add("speak");
     $("broadName").innerHTML = profileName + " está transmitindo";
     pv.play().catch(function () {});
     stream.getVideoTracks()[0].addEventListener("ended", function () {
@@ -885,11 +1156,19 @@
     tearDownPc();
     setupPc();
     try {
-      pc.addTransceiver(stream.getVideoTracks()[0], { streams: [stream], sendEncodings: [{ maxBitrate: 5000000, maxFramerate: 30 }] });
+      pc.addTransceiver(stream.getVideoTracks()[0], { streams: [stream], sendEncodings: [{ maxBitrate: 8000000, maxFramerate: 60 }] });
     } catch (e) {
       pc.addTrack(stream.getVideoTracks()[0]);
     }
+    try {
+      var vs = pc.getSenders().find(function (x) { return x.track && x.track.kind === "video"; });
+      if (vs) { var prm = vs.getParameters(); if (prm) { prm.degradationPreference = "maintain-framerate"; vs.setParameters(prm); } }
+    } catch (e) {}
+    try { audioTrans = pc.addTransceiver("audio", { direction: "sendrecv" }); } catch (e) {}
+    var saT = stream.getAudioTracks()[0];
+    if (saT) { try { pc.addTrack(saT, stream); } catch (e) {} }
     setCodecPrefs();
+    if (!state.muted && micStream) { syncMicToPc(micStream.getAudioTracks()[0]); startVox(); }
     try {
       var s = stream.getVideoTracks()[0].getSettings();
       setStatus("Capturando tela " + s.width + "x" + s.height + (s.frameRate ? " @" + Math.round(s.frameRate) + "fps" : "") + ".", "ok");
@@ -966,7 +1245,10 @@
 
   /* ===== Encerrar tudo ===== */
   function stopEverything() {
+    if (fullTimer) { clearTimeout(fullTimer); fullTimer = null; }
     tearDownPc();
+    stopVox();
+    stopRemoteAudio();
     if (mq) { try { mq.end(true); } catch (e) {} mq = null; }
     if (myStream) { myStream.getTracks().forEach(function (t) { try { t.stop(); } catch (e) {} }); myStream = null; }
     topic = null; role = null;
@@ -979,10 +1261,12 @@
     $("tileView").classList.remove("speak");
     $("preview").srcObject = null;
     $("view").srcObject = null;
+    try { $("view").muted = true; } catch (e) {}
     $("statusPill").classList.add("hidden");
     $("statusPill").textContent = "";
     renderMembers();
     refreshRoomChip();
+    renderUserChans();
   }
 
   window.addEventListener("beforeunload", function () {
@@ -999,7 +1283,9 @@
   $("textInput").addEventListener("keydown", function (e) { if (e.key === "Enter") pubMsg(); });
   $("chatInput").addEventListener("keydown", function (e) { if (e.key === "Enter") pubMsg(); });
   if (profileName) $("loginName").value = profileName;
+  try { $("view").muted = false; } catch (e) {}
   buildEmojiPop();
+  renderUserChans();
   renderMsgs();
   renderMembers();
 </script>
